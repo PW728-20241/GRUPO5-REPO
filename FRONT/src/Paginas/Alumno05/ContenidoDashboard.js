@@ -19,10 +19,11 @@ function infoDiaX(props)
                         <Typography variant="h3">{infoDia.cantUsuarioNuevos}</Typography>
                         <Typography>Usuarios nuevos</Typography>
                     </Paper>
+                    
                 </Grid>
                 <Grid item xs={12} md={4}>
                     <Paper sx={{padding: 2, textAlign:'center', backgroundColor: '#FFEB3B'}}>
-                        <Typography variant="h3">S/ {infoDia.ingresosDia}</Typography>
+                        <Typography variant="h3">S/ {parseFloat(infoDia.ingresosDia).toFixed(2)}</Typography>
                         <Typography>Ingresos de hoy</Typography>
                     </Paper>
                 </Grid>

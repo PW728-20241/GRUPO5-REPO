@@ -232,6 +232,30 @@ app.get('/usuarios/fechaRegistro/:fechaRegistro', async function(req, res) {
     }
 });
 
+app.get('/orden/fechaOrden/:fechaOrden', async function(req, res) {
+    const fechaOrden = req.params.fechaOrden.substring(0, 10);
+    const fechaInicio = new Date(`${fechaOrden}T00:00:00.000Z`);
+    const fechaFin = new Date(`${fechaOrden}T23:59:59.999Z`);
+
+    try {
+        const orden = await Orden.findAll({
+            where: {
+                fechaOrden: {
+                    [Op.between]: [fechaInicio, fechaFin] // Usa between para abarcar todo el día
+                }
+            }
+        });
+
+        if (orden.length > 0) {
+            res.json(orden);
+        } else {
+            res.status(404).json({ error: "Ordenes no encontradas" });
+        }
+    } catch (error) {
+        console.error('Error al buscar ordenes:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
 app.get("/productos5",function(req,res){
     res.json(arreglo_general);
 });
