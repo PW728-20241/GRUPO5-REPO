@@ -396,8 +396,30 @@ app.put("/usuarios/cambioEstado/:id", async function(req, res) {
     }
 });
 
-/**SOBRE LAS ORDENES DE ACUERDO AL DETALLE DEL USUARIO */
+/**ENDPOINT QUE ME VA A PERMITIR MOSTRAR EL DETALLE DEL USUARIO AL CLICKEAR VER */
+app.get("/usuarios/detalle/:id", async (req, res) => {
+    const { id } = req.params;
+    try {
+        const usuario = await Usuario.findByPk(id, {
+            attributes: [
+                'id',
+                [sequelize.fn('concat', sequelize.col('nombre'), ' ', sequelize.col('apellido')), 'nombreCompleto'],
+                'correo',
+                'fechaRegistro'
+            ]
+        });
+        if (usuario) {
+            res.json(usuario);
+        } else {
+            res.status(404).send("Usuario no encontrado");
+        }
+    } catch (error) {
+        console.error("Error al obtener los detalles del usuario:", error);
+        res.status(500).send("Error interno del servidor");
+    }
+});
 
+/**SOBRE LAS ORDENES DE ACUERDO AL DETALLE DEL USUARIO */
 app.get('/usuarios/:id/ordenes', function(req, res) {
     const usuarioId = parseInt(req.params.id, 10);
     const ordenesUsuario = ordenes.filter(item => item.usuarioId === usuarioId);
