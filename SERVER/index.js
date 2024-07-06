@@ -419,24 +419,43 @@ app.get("/usuarios/detalle/:id", async (req, res) => {
     }
 });
 
-/**SOBRE LAS ORDENES DE ACUERDO AL DETALLE DEL USUARIO */
-app.get('/usuarios/:id/ordenes', function(req, res) {
-    const usuarioId = parseInt(req.params.id, 10);
-    const ordenesUsuario = ordenes.filter(item => item.usuarioId === usuarioId);
 
-    if (ordenesUsuario.length > 0) {
-        res.json(ordenesUsuario);
-    } else {
-        res.status(404).send("No se encontraron órdenes para este usuario");
+/** NOS MUESTRA TODA LA LISTA DE ORDENES USANDO UN ATRIBUTO DE LA TABLA DE USUARIOS*/
+app.get("/ordenes", async (req, res) => {
+    try {
+        const ordenes = await Orden.findAll({
+            attributes: [
+                'id',
+                [sequelize.literal(`"Usuario"."nombre" || ' ' || "Usuario"."apellido"`), 'nombreUsuario'], //ESTO SIRVE PARA PODER HACER UNA SENTENCIA SQL :)
+                'fechaOrden', 
+                'total', 
+                [sequelize.col('Usuario.correo'), 'correoUsuario'], 
+                'estado' 
+            ],
+            include: [
+                {
+                    model: Usuario,
+                    attributes: [] // AQUI SE INCLUYE LOS ATRIBUTOS QUE COLECTAMOS COMO LISTA AAAA
+                }
+            ]
+        });
+        if (ordenes.length > 0) {
+            res.json(ordenes);
+        } else {
+            res.status(404).send("No se encontraron órdenes.");
+        }
+    } catch (error) {
+        console.error("Error al obtener la lista de órdenes:", error);
+        res.status(500).send("Error interno del servidor");
     }
 });
 
-/** NOS MUESTRA TODA LA LISTA DE ORDENES*/
+/*
 app.get('/ordenes', async function(req,res){
     const ordenes = await Orden.findAll();
         res.json(ordenes);
 });
-
+*/
 /**SIRVE PARA BUSCAR UNA ORDEN DE ACUERDO A CIERTOS PARAMETROS **/
 app.get('/ordenes-url', async function(req,res){
     const {id, usuario} = req.query;
