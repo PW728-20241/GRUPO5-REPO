@@ -341,68 +341,61 @@ app.get('/usuarios', async function(req,res){
     res.json(usuarios);
 });
 
-
-app.get('/usuarios-url', async (req, res) => {
-    const { correo, nombre, apellido } = req.query;
-  
+/* SIRVE PARA BUSCAR UN USUARIO POR SU NOMBRE */
+app.get('/usuarios/:busqueda', async function(req, res) {
+    const query = req.params.busqueda.toLowerCase();
     try {
-      const usuario = await Usuario.findAll({
-        where: {
-          correo: correo,
-          nombre: nombre,
-          apellido: apellido
-        }
-      });
-      if (usuario) {
-        res.json(usuario);
-      } else {
-        res.status(404).send("Usuario no encontrado");
-      }
-    } catch (error) {
-      console.error('Error al obtener el usuario:', error);
-      res.status(500).json({ error: 'Error al obtener el usuario' });
-    }
-  });
-
-
-/* ESTO SIRVE PARA QUE DESACTIVES A UN USUARIO PERO USANDO EL PUT*/ 
-app.put("/usuarios/:id/desactivar", async function(req, res) {
-    const { id } = req.params;
-    try {
-      const [updated] = await Usuario.update({ estado: 'Inactivo' }, {
-        where: { id: id }
-      });
-  
-      if (updated) {
-        res.send("Usuario desactivado");
-      } else {
-        res.status(404).send("Usuario no encontrado");
-      }
-    } catch (error) {
-      console.error("Ocurrió un error al desactivar el usuario:", error);
-      res.status(500).send("Ocurrió un error al desactivar el usuario");
-    }
-  });
-
-
-/*
-PARA ELIMINAR UN USUARIO CON DELETE
-app.delete("/usuarios/:id", async function(req, res) {
-    const id = req.params.id;
-    try {
-        await Usuario.destroy({
+        const usuarios = await Usuario.findAll({
             where: {
-                id: id
+                [Op.or]: [
+                    {
+                        nombre: {
+                            [Op.iLike]: `%${query}%`
+                        }
+                    },
+                    {
+                        apellido: {
+                            [Op.iLike]: `%${query}%`
+                        }
+                    },
+                    {
+                        correo: {
+                            [Op.iLike]: `%${query}%`
+                        }
+                    }
+                ]
             }
-        })
-        res.send("Usuario eliminado");
-    }
-    catch(error) {
-        console.log("Ocurrio error: ", error);
-        res.status(400).send("Ocurrio un error");
+        });
+        if (usuarios.length > 0) {
+            res.json(usuarios);
+        } else {
+            res.status(404).send("No se encontraron usuarios que coincidan con la búsqueda.");
+        }
+    } catch (error) {
+        console.error('Error al buscar usuarios:', error);
+        res.status(500).send("Error interno del servidor");
     }
 });
-*/
+
+
+/* ESTO SIRVE PARA CAMBIAR ESTADO A UN USUARIO PERO USANDO EL PUT*/ 
+app.put("/usuarios/cambioEstado/:id", async function(req, res) {
+    const { id } = req.params;
+    try {
+        const usuario = await Usuario.findByPk(id);
+        if (usuario) {
+            const nuevoEstado = usuario.estado === 'Activo' ? 'Inactivo' : 'Activo';
+            await usuario.update({ estado: nuevoEstado });
+            res.json({ mensaje: `Usuario actualizado a estado: ${nuevoEstado}`, usuario });
+        } else {
+            res.status(404).send("Usuario no encontrado");
+        }
+    } catch (error) {
+        console.error("Ocurrió un error al cambiar el estado del usuario:", error);
+        res.status(500).send("Ocurrió un error al cambiar el estado del usuario");
+    }
+});
+
 /**SOBRE LAS ORDENES DE ACUERDO AL DETALLE DEL USUARIO */
 
 app.get('/usuarios/:id/ordenes', function(req, res) {
