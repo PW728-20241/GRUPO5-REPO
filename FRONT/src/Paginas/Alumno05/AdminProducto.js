@@ -101,7 +101,7 @@ function AdminProducto (){
                                 <TableRow>
                                     <TableCell style={{ textAlign: 'center' }}>ID</TableCell>
                                     <TableCell style={{ textAlign: 'center' }}>Nombre</TableCell>
-                                    <TableCell style={{ textAlign: 'center' }}>Serie</TableCell>
+                                    <TableCell style={{ textAlign: 'center' }}>Editor</TableCell>
                                     <TableCell style={{ textAlign: 'center' }}>Precio (S/)</TableCell>
                                     <TableCell style={{ textAlign: 'center' }}>Fecha de Registro</TableCell>
                                     <TableCell style={{ textAlign: 'center' }}>Stock</TableCell>

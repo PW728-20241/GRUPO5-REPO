@@ -252,6 +252,7 @@ app.post('/productos', async (req, res) => {
             editor,
             precio,
             stock,
+            estado:'Activo',
             imageUrl: ''
         });
 
