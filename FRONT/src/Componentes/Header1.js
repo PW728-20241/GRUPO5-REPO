@@ -39,7 +39,7 @@ const Navegar = styled(Button)(({ theme }) => ({
   },
 }));
 
-const Header1 = () => {
+const Header1 = ({ isAuthenticated, handleLogout }) => {
   const navigate = useNavigate();
 
   const handleNavigate = (path, section) => {
@@ -76,20 +76,47 @@ const Header1 = () => {
                 Ofertas
               </Navegar>
             </Grow>
-            <Box  sx={{ flexGrow: 1 }} />
+            <Box sx={{ flexGrow: 1 }} />
             <IconButton href="/carritocompra" color="inherit">
               <ShoppingCartIcon />
             </IconButton>
-            <Grow in={true} timeout={1300} >
+            <Grow in={true} timeout={1300}>
               <Navegar href='/ayuda'>
                 Ayuda
               </Navegar>
             </Grow>
-            <Grow in={true} timeout={1500}>
-              <Button variant="contained" sx={{ marginLeft: 2, backgroundColor: '#fbbd08', color: '#ffffff' }}>
-                Mi Cuenta
-              </Button>
-            </Grow>
+            {isAuthenticated ? (
+              <>
+                <Grow in={true} timeout={1500}>
+                  <Button
+                    variant="contained"
+                    sx={{ marginLeft: 2, backgroundColor: '#fbbd08', color: '#ffffff' }}
+                    onClick={() => navigate('/dashboard')}
+                  >
+                    Mi Cuenta
+                  </Button>
+                </Grow>
+                <Grow in={true} timeout={1700}>
+                  <Button
+                    variant="contained"
+                    sx={{ marginLeft: 2, backgroundColor: '#fbbd08', color: '#ffffff' }}
+                    onClick={handleLogout}
+                  >
+                    Cerrar Sesión
+                  </Button>
+                </Grow>
+              </>
+            ) : (
+              <Grow in={true} timeout={1500}>
+                <Button
+                  variant="contained"
+                  sx={{ marginLeft: 2, backgroundColor: '#fbbd08', color: '#ffffff' }}
+                  onClick={() => navigate('/iniciar-sesion')}
+                >
+                  Mi Cuenta
+                </Button>
+              </Grow>
+            )}
           </Toolbar>
         </AppBar>
       </Slide>

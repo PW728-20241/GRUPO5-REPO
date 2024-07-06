@@ -9,8 +9,12 @@ import NuevaSeccion from './PAGINA_PRINCIPAL/NuevaSeccion';
 
 const PaginaPrincipal = () => {
   const [productos, setProductos] = useState([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    setIsAuthenticated(!!token);
+
     async function obtenerProductos() {
       try {
         const response = await fetch('http://localhost:3100/productos');
@@ -35,6 +39,12 @@ const PaginaPrincipal = () => {
     obtenerProductos();
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setIsAuthenticated(false);
+    window.location.reload(); // Refrescar la página para aplicar cambios
+  };
+
   // Filtrar productos por categorías específicas
   const categorias = productos.filter(producto => producto.categoria === 'Colección');
   
@@ -48,7 +58,7 @@ const PaginaPrincipal = () => {
 
   return (
     <>
-      <Header />
+      <Header isAuthenticated={isAuthenticated} handleLogout={handleLogout} />
       <Container maxWidth="lg">
         <BarradeBusqueda />
         

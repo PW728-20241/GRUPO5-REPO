@@ -24,7 +24,7 @@ const IniciarSesion = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                alert(data.message);
+                localStorage.setItem('token', data.token); // Guardar el token en localStorage
                 navigate('/'); // Redirige a la página principal u otra página
             } else {
                 const errorData = await response.json();

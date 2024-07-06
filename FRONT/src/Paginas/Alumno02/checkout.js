@@ -79,7 +79,7 @@ const CheckoutPage = () => {
         localStorage.removeItem('cartItems');
         setCartItems([]);
         // Redirige a DetalleOrden con los detalles de la orden
-        navigate('/detalle-orden', { state: { orderDetails: { ...result, shippingAddress, paymentMethod, creditCard, cartItems, total, shippingMethod } } });
+        navigate('/', { state: { orderDetails: { ...result, shippingAddress, paymentMethod, creditCard, cartItems, total, shippingMethod } } });
       } else {
         alert('Error al completar la orden');
       }

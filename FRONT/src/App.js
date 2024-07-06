@@ -24,7 +24,7 @@ import ListadoSeries from './Paginas/Alumno04/LSA';
 
 import DashboardUsuario from './Paginas/Alumno03/DashboardUsuario';
 
-
+import ProtectedRoute from './Componentes/protectedroute';
 import AcercaDeNosotros from './Componentes/AcercadeNosotros';
 import PoliticaDeEnvio from './Componentes/Politicaenvio';
 import FAQ from './Componentes/FAQ';
@@ -53,7 +53,14 @@ function App (){
               <Route path='/carrito' element={<CartPage/>}/>
               <Route path='/graciascompra' element={<ThankYouPage/>}/>
               <Route path='/carritocompra' element={<CartPage/>}/>
-              <Route path='/checkout' element={<CheckoutPage/>}/>
+              <Route 
+              path='/checkout' 
+              element={
+              <ProtectedRoute>
+              <CheckoutPage/>
+              </ProtectedRoute>
+              }
+              />
               <Route path='/registrar'element={<Registrar/>}/>
               <Route path='/iniciarsesion'element={<Iniciarsesion/>}/>
               <Route path='/RecuperarPassword'element={<RecuperarPassword/>}/>
