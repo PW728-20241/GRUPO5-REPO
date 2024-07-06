@@ -6,33 +6,58 @@ import BarLateral from '../../Componentes/BarraLateral2';
 import ContenidoTabla from './ContenidoTablaProd';
 import { Link as RouterLink } from 'react-router-dom';
 
-const AdminProducto = () => {
+function AdminProducto (){
     const [data, setData] = useState([]);
-    const [searchQuery, setSearchQuery] = useState("");
-    
-    async function buscarProducto(query = "") {
-        const URL_base = "http://localhost:3100/productos";
-        const url = query ? `${URL_base}-url?id=${query}&nombre=${query}&editor=${query}&estado=${query}` : URL_base;
-        
+    const [allData, setAllData] = useState([]);
+    const [searchParams, setSearchParams] = useState('');
+    const [paginaActual, setpaginaActual] = useState(1);
+    const productosPorPagina = 5;
+
+    const fetchData = async () => {
         try {
-            const res = await fetch(url);
-            if (res.status === 200) {
-                const data = await res.json();
-                setData(data);
-            } else {
-                alert("Producto no existe");
-            }
+            const URL_base = 'http://localhost:3100/';
+            const respuesta = await fetch(URL_base + 'productos');
+            const resultado = await respuesta.json();
+            const productosOrdenados = resultado.sort((a, b) => a.id - b.id); // Ordenar los productos por id
+            setData(productosOrdenados);
+            setAllData(productosOrdenados);
         } catch (error) {
-            console.error('Error fetching data:', error);
+            console.error('No se encontró data: ', error);
         }
-    }
+    };
 
     useEffect(() => {
-        buscarProducto();
+        fetchData();
     }, []);
 
-    const handleSearch = () => {
-        buscarProducto(searchQuery);
+    const filtrarID = async () => {
+        if (searchParams.trim() === '') {
+            setData(allData); 
+            setpaginaActual(1);
+            return;
+        }
+        
+        try {
+            const URL_base = 'http://localhost:3100/';
+            const respuesta = await fetch(`${URL_base}producto/id/${searchParams}`);
+            if (!respuesta.ok) {
+                throw new Error('Producto no encontrado');
+            }
+            const resultado = await respuesta.json();
+            setData([resultado]); 
+            setpaginaActual(1);
+        } catch (error) {
+            console.error('Error al buscar producto:', error);
+            setData([]); 
+        }
+    };
+
+    const indexDelUltimoProducto = paginaActual * productosPorPagina;
+    const indexDelPrimerProducto = indexDelUltimoProducto - productosPorPagina;
+    const productosActuales = data.filter(producto => producto.estado !== 'Eliminado').slice(indexDelPrimerProducto, indexDelUltimoProducto);
+
+    const handlePageChange = (event, value) => {
+        setpaginaActual(value);
     };
 
     return (
@@ -48,10 +73,23 @@ const AdminProducto = () => {
                             Agregar Producto
                         </Button>
                     </Box>
-                    <TextField id="buscarP" label="Buscar por ID, Nombre o Editor" variant="outlined" fullWidth sx={{ mb: 2 }} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                    <TextField
+                        id="buscarP"
+                        label="Buscar por ID"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={searchParams}
+                        onChange={(e) => setSearchParams(e.target.value)}
                         InputProps={{
                             endAdornment: (
-                                <Button type="button" onClick={handleSearch} variant="contained" component="label" style={{ backgroundColor: '#FFEB3B', color: 'black', fontWeight: 'bold' }}>
+                                <Button
+                                    type="button"
+                                    onClick={filtrarID}
+                                    variant="contained"
+                                    component="label"
+                                    style={{ backgroundColor: '#FFEB3B', color: 'black', fontWeight: 'bold' }}
+                                >
                                     Buscar
                                 </Button>
                             ),
@@ -63,7 +101,7 @@ const AdminProducto = () => {
                                 <TableRow>
                                     <TableCell style={{ textAlign: 'center' }}>ID</TableCell>
                                     <TableCell style={{ textAlign: 'center' }}>Nombre</TableCell>
-                                    <TableCell style={{ textAlign: 'center' }}>Editor</TableCell>
+                                    <TableCell style={{ textAlign: 'center' }}>Serie</TableCell>
                                     <TableCell style={{ textAlign: 'center' }}>Precio (S/)</TableCell>
                                     <TableCell style={{ textAlign: 'center' }}>Fecha de Registro</TableCell>
                                     <TableCell style={{ textAlign: 'center' }}>Stock</TableCell>
@@ -72,7 +110,7 @@ const AdminProducto = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {data.length > 0 ? data.filter(producto => producto.estado !== 'Eliminado').map((producto, index) => (
+                                {productosActuales.length > 0 ? productosActuales.map((producto, index) => (
                                     <ContenidoTabla key={index} producto={producto}/>
                                 )) : (
                                     <TableRow>
@@ -83,7 +121,11 @@ const AdminProducto = () => {
                         </Table>
                     </TableContainer>
                     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-                        <Pagination />
+                        <Pagination 
+                            count={Math.ceil(data.filter(producto => producto.estado !== 'Eliminado').length / productosPorPagina)} 
+                            page={paginaActual} 
+                            onChange={handlePageChange} 
+                        />
                     </Box>
                 </Container>
             </Box>

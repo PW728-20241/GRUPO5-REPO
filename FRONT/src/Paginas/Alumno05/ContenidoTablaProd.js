@@ -19,7 +19,7 @@ function AgregarFila(props) {
             <TableCell style={{ textAlign: 'center' }}>{producto.nombre}</TableCell>
             <TableCell style={{ textAlign: 'center' }}>{producto.editor}</TableCell>
             <TableCell style={{ textAlign: 'center' }}>{parseFloat(producto.precio).toFixed(2)}</TableCell>
-            <TableCell style={{ textAlign: 'center' }}>{producto.fechaRegistro}</TableCell>
+            <TableCell style={{ textAlign: 'center' }}>{producto.fechaRegistro.substring(0, 10)}</TableCell>
             <TableCell style={{ textAlign: 'center' }}>{producto.stock}</TableCell>
             <TableCell style={{ textAlign: 'center' }}>{producto.estado}</TableCell>
             <TableCell style={{ textAlign: 'center' }}>
