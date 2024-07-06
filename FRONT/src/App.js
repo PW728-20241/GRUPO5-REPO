@@ -21,6 +21,10 @@ import Registrar from './Paginas/Alumno03/Registrar';
 import Iniciarsesion from './Paginas/Alumno03/IniciarSesion';
 import RecuperarPassword from './Paginas/Alumno03/RecuperarPassword';
 import ListadoSeries from './Paginas/Alumno04/LSA';
+
+import DashboardUsuario from './Paginas/Alumno03/DashboardUsuario';
+
+
 import AcercaDeNosotros from './Componentes/AcercadeNosotros';
 import PoliticaDeEnvio from './Componentes/Politicaenvio';
 import FAQ from './Componentes/FAQ';
@@ -53,6 +57,7 @@ function App (){
               <Route path='/registrar'element={<Registrar/>}/>
               <Route path='/iniciarsesion'element={<Iniciarsesion/>}/>
               <Route path='/RecuperarPassword'element={<RecuperarPassword/>}/>
+              <Route path='/DashboardUsuario' element={<DashboardUsuario/>}/>
 
 
 

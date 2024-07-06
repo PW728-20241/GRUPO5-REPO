@@ -66,7 +66,7 @@ const CreateSerie = () => {
       }
       const data = await response.json();
       console.log('Serie creada:', data);
-      navigate('/ListadoSeries'); // Redirige a la página de series
+      navigate('/ListaSeries'); // Redirige a la página de series
     } catch (error) {
       console.error('Error creando la serie:', error);
     }

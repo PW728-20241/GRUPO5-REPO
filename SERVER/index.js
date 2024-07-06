@@ -5,12 +5,9 @@ import { faker } from '@faker-js/faker';
 
 import { sequelize } from "./database/database.js";
 
-import { Producto } from "./models/Producto.js";
-import { Usuario } from "./models/Usuario.js";
 
 import { Sequelize } from "sequelize";
-import { Serie } from "./models/Serie.js";
-import { Orden } from "./models/Orden.js";
+import { Usuario, Producto, Serie, Orden, OrderProduct } from './models/Relation.js';
 
 
 const app = express();
@@ -99,11 +96,6 @@ app.get("/productos", async function(req,res){
 
 });
 
-// Endpoint para crear un nuevo producto
-app.post('/productos', async function(req, res) {
-    const data = req.body;
-    //if(data.nombre && data.descripcion && data.)
-});
 
 app.delete('/productos/:id',async function(req,res)
 {
@@ -123,16 +115,6 @@ app.delete('/productos/:id',async function(req,res)
     
 });
 
-/*app.get('/producto/id/:id', function(req, res) {
-    const id = parseInt(req.params.id, 10);
-    const producto = productos.find(p => p.id === id);
-    if (producto) {
-        res.json(producto);
-    } else {
-        res.status(404).json({ error: "Producto no encontrado" });
-    }
-});*/
-
 app.get('/producto/id/:id', async function(req, res) {
     const id = parseInt(req.params.id, 10);
     const producto = await Producto.findByPk(id);
@@ -143,39 +125,7 @@ app.get('/producto/id/:id', async function(req, res) {
     }
 });
 
-/*app.get('/producto/nombre/:nombre', function(req, res){
-    const nombre = req.params.nombre.toLowerCase();
-    const producto = productos.find(pub => pub.nombre.toLowerCase() === nombre);
-    if (producto) {
-        res.json(producto);
-    } else {
-        res.status(404).send("Producto no encontrado");
-    }
-});*/
 
-app.get('/producto/nombre/:nombre', async function(req, res){
-    const nombre = req.params.nombre.toLowerCase();
-    const producto = await Producto.findOne({
-        where: {
-            nombre: nombre
-        }
-    });
-    if (producto) {
-        res.json(producto);
-    } else {
-        res.status(404).send("Producto no encontrado");
-    }
-});
-
-app.get('/producto/id/:id', async function(req, res) {
-    const id = parseInt(req.params.id, 10);
-    const producto = await Producto.findByPk(id);
-    if (producto) {
-        res.json(producto);
-    } else {
-        res.status(404).json({ error: "Producto no encontrado" });
-    }
-});
 
 app.put("/producto/:id", async function(req,res)
 {
@@ -265,19 +215,24 @@ app.get("/productos/random", function (req, res) {
     res.json(randomItems);
 });
 
-app.post("/productos",function(req,res)
-{
-    const data=req.body;
-    if(data&&data.nombre&&data.editor&&data.precio&&data.fechaRegistro&&data.stock)
-    {
-        const nuevoID = arreglo_general.length+1;
-        const nuevoProducto = crearProducto(nuevoID,data.nombre&&data.editor&&data.precio&&data.fechaRegistro&&data.stock);
-        arreglo_general.push(nuevoProducto);
-        res.json(nuevoProducto);
-    }
-    else
-    {
-        res.status(400).send("Faltan datos");
+app.post('/productos', async (req, res) => {
+    const { nombre, descripcion, caracteristicas, editor, precio, stock, imageUrl } = req.body;
+
+    try {
+        const nuevoProducto = await Producto.create({
+            nombre,
+            descripcion,
+            caracteristicas,
+            editor,
+            precio,
+            stock,
+            imageUrl: ''
+        });
+
+        res.status(201).json(nuevoProducto);
+    } catch (error) {
+        console.error('Error al crear el producto:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -496,62 +451,246 @@ app.post('/recuperarPassword', async (req, res) => {
     }
 });
 
+/*
+ENDPOINTS PARA ORDENES
+*/
+// Crear una nueva orden
+app.post('/ordenes', async (req, res) => {
+    const { fechaOrden, total, estado, metodoEnvio, metodoPago, direccion } = req.body;
+    
+    try {
+        const nuevaOrden = await Orden.create({
+            fechaOrden,
+            total,
+            estado,
+            metodoEnvio,
+            metodoPago,
+            direccion
+        });
 
-function crearSeries(id, nombre, descripcion, fechaCreacion, productos) {
-    return {
-        id: id,
-        nombre: nombre,
-        descripcion: descripcion,
-        fechaCreacion: fechaCreacion,
-        nroproductos: productos.length,
-        productos: productos
-    };
-}
+        res.status(201).json(nuevaOrden);
+    } catch (error) {
+        console.error('Error creando la orden:', error);
+        res.status(500).json({ error: 'Error interno al crear la orden' });
+    }
+});
 
-const series = [
-    crearSeries(1, "Mortal Kombat", "Colección de la serie de MK", "11/02/2022", ["Mortal Kombat"]),
-    crearSeries(2, "Grand Theft Auto", "Colección del GTA", "1/07/2024", ["Grand Theft Auto V"])
-];
+// Obtener una orden por ID
+app.get('/ordenes/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const orden = await Orden.findByPk(id);
+
+        if (!orden) {
+            return res.status(404).json({ error: 'Orden no encontrada' });
+        }
+
+        res.json(orden);
+    } catch (error) {
+        console.error('Error obteniendo la orden:', error);
+        res.status(500).json({ error: 'Error interno al obtener la orden' });
+    }
+});
+
+// Actualizar una orden por ID
+app.put('/ordenes/:id', async (req, res) => {
+    const { id } = req.params;
+    const { fechaOrden, total, estado, metodoEnvio, metodoPago, direccion } = req.body;
+
+    try {
+        const orden = await Orden.findByPk(id);
+
+        if (!orden) {
+            return res.status(404).json({ error: 'Orden no encontrada' });
+        }
+
+        await orden.update({
+            fechaOrden,
+            total,
+            estado,
+            metodoEnvio,
+            metodoPago,
+            direccion
+        });
+
+        res.json(orden);
+    } catch (error) {
+        console.error('Error actualizando la orden:', error);
+        res.status(500).json({ error: 'Error interno al actualizar la orden' });
+    }
+});
+
+// Eliminar una orden por ID
+app.delete('/ordenes/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const orden = await Orden.findByPk(id);
+
+        if (!orden) {
+            return res.status(404).json({ error: 'Orden no encontrada' });
+        }
+
+        await orden.destroy();
+
+        res.json({ message: 'Orden eliminada' });
+    } catch (error) {
+        console.error('Error eliminando la orden:', error);
+        res.status(500).json({ error: 'Error interno al eliminar la orden' });
+    }
+});
+
+
+
+/*
+TERMINA ACA LOS ENDPOINTS PARA ORDENES
+*/
+
+
+
 
 // Endpoint para obtener todas las series con sus productos
-app.get("/series", (req, res) => {
-    const seriesResponse = series.map(serie => ({
-        id: serie.id,
-        nombre: serie.nombre,
-        descripcion: serie.descripcion,
-        fechaCreacion: serie.fechaCreacion,
-        nroproductos: serie.productos.length
-    }));
-    res.json(seriesResponse);
-});
+app.get('/series', async (req, res) => {
+    try {
+        const series = await Serie.findAll({
+            include: [
+                {
+                    model: Producto,
+                    attributes: []
+                }
+            ],
+            attributes: [
+                'id',
+                'nombre',
+                'descripcion',
+                'fechaCreacion',
+                'numeroProductos',
+                'imgUrl',
+                [sequelize.fn('COUNT', sequelize.col('Productos.id')), 'nroproductos']
+            ],
+            group: ['Serie.id', 'Serie.nombre', 'Serie.descripcion', 'Serie.fechaCreacion', 'Serie.numeroProductos', 'Serie.imgUrl']
+        });
 
-app.get('/series/:id', (req, res) => {
-    const id = parseInt(req.params.id, 10);
-    const serie = series.find(s => s.id === id);
-    if (serie) {
-        res.json(serie);
-    } else {
-        res.status(404).send("Serie no encontrada");
+        res.json(series);
+    } catch (error) {
+        console.error('Error obteniendo las series:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
-app.put('/series/:id', (req, res) => {
-    const id = parseInt(req.params.id, 10);
-    const serie = series.find(s => s.id === id);
-    if (serie) {
-        Object.assign(serie, req.body);
-        res.json(serie);
-    } else {
-        res.status(404).send("Serie no encontrada");
+
+app.post('/series', async (req, res) => {
+    const { nombre, descripcion, fechaCreacion, productos } = req.body;
+
+    try {
+        // Crear nueva serie en la base de datos
+        const nuevaSerie = await Serie.create({
+            nombre,
+            descripcion,
+            fechaCreacion,
+            numeroProductos: productos.length
+        });
+
+        // Establecer las relaciones con los productos
+        for (const productoNombre of productos) {
+            const producto = await Producto.findOne({ where: { nombre: productoNombre } });
+            if (producto) {
+                producto.serieId = nuevaSerie.id;
+                await producto.save();
+            }
+        }
+
+        res.status(201).json(nuevaSerie);
+    } catch (error) {
+        console.error('Error creando la serie:', error);
+        res.status(500).json({ error: 'Error interno al crear la serie' });
     }
 });
-app.post('/series', (req, res) => {
-    const nuevaSerie = req.body;
-    nuevaSerie.id = series.length + 1;
-    nuevaSerie.nroproductos = nuevaSerie.productos.length;
-    series.push(nuevaSerie);
-    res.json(nuevaSerie);
+app.get('/series/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const serie = await Serie.findByPk(id, {
+            include: Producto,
+            attributes: {
+                include: [
+                    [sequelize.fn('COUNT', sequelize.col('Productos.id')), 'numeroProductos']
+                ]
+            },
+            group: ['Serie.id', 'Productos.id']
+        });
+        if (!serie) {
+            return res.status(404).json({ error: 'Serie no encontrada' });
+        }
+        res.json(serie);
+    } catch (error) {
+        console.error('Error obteniendo la serie:', error);
+        res.status(500).json({ error: 'Error interno al obtener la serie' });
+    }
 });
+app.put('/series/:id', async (req, res) => {
+    const { id } = req.params;
+    const { nombre, descripcion, productos } = req.body;
+
+    try {
+        // Buscar la serie por ID
+        const serie = await Serie.findByPk(id);
+
+        if (!serie) {
+            return res.status(404).json({ error: 'Serie no encontrada' });
+        }
+
+        // Actualizar los datos de la serie
+        serie.nombre = nombre;
+        serie.descripcion = descripcion;
+
+        // Guardar los cambios de la serie
+        await serie.save();
+
+        // Actualizar los productos asociados a la serie
+        if (productos && productos.length > 0) {
+            // Eliminar las asociaciones actuales
+            await Producto.update({ serieId: null }, { where: { serieId: id } });
+
+            // Asociar los nuevos productos
+            for (const productName of productos) {
+                const producto = await Producto.findOne({ where: { nombre: productName } });
+                if (producto) {
+                    producto.serieId = id;
+                    await producto.save();
+                }
+            }
+        }
+
+        res.status(200).json({ message: 'Serie actualizada exitosamente' });
+    } catch (error) {
+        console.error('Error actualizando la serie:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+app.delete('/series/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const serie = await Serie.findByPk(id);
+        if (!serie) {
+            return res.status(404).json({ error: 'Serie no encontrada' });
+        }
+
+        // Desvincular productos asociados
+        await Producto.update({ serieId: null }, { where: { serieId: id } });
+
+        await serie.destroy();
+        res.status(204).send();
+    } catch (error) {
+        console.error('Error eliminando la serie:', error);
+        res.status(500).json({ error: 'Error interno al eliminar la serie' });
+    }
+});
+
+
+
 
 // Datos en memoria para el ejemplo
 let carrito = [];

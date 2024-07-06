@@ -1,7 +1,5 @@
-// models/Usuario.js
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../database/database.js';
-import { Orden } from './Orden.js';
 
 export const Usuario = sequelize.define('Usuario', {
     id: {
@@ -10,33 +8,27 @@ export const Usuario = sequelize.define('Usuario', {
         autoIncrement: true
     },
     nombre: {
-        type: DataTypes.STRING,
-        allowNull: false
+        type: DataTypes.STRING
     },
     apellido: {
-        type: DataTypes.STRING,
-        allowNull: false
+        type: DataTypes.STRING
     },
     correo: {
         type: DataTypes.STRING,
-        allowNull: false,
         unique: true
     },
     password: {
-        type: DataTypes.STRING,
-        allowNull: false
+        type: DataTypes.STRING
     },
     fechaRegistro: {
         type: DataTypes.DATE,
-        allowNull: false,
         defaultValue: DataTypes.NOW
     },
     estado: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        defaultValue: 'Activo'
+        type: DataTypes.STRING
     }
 }, {
     freezeTableName: true,
     timestamps: false
 });
+

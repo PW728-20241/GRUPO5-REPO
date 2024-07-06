@@ -54,7 +54,7 @@ const SeriesTable = () => {
           onChange={handleSearchChange}
           sx={{ marginRight: 2 }}
         />
-        <Button variant="contained" color="primary" component={Link} to="/crear/serie">
+        <Button variant="contained" color="primary" component={Link} to="/crear-serie">
           Crear serie
         </Button>
       </Box>

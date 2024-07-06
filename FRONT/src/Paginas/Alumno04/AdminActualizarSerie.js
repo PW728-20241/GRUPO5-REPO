@@ -64,7 +64,11 @@ const SeriesDetail = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(updatedSerie)
+        body: JSON.stringify({
+          nombre: updatedSerie.nombre,
+          descripcion: updatedSerie.descripcion,
+          productos: updatedSerie.productos
+        })
       });
       if (!response.ok) {
         throw new Error('Error updating series');
@@ -75,7 +79,6 @@ const SeriesDetail = () => {
       console.error("Error actualizando la serie:", error);
     }
   };
-
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
     const filtered = productos.filter(product =>
