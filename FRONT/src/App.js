@@ -47,7 +47,7 @@ function App (){
               <Route path='/ListaSeries' element={<ListadoSeries/>}/>
               <Route path='/ver/serie/:id' element={<SeriesDetail/>}/>
               <Route path='/crear-serie' element={<CreateSerie/>}/>
-              <Route path='/detalleorden' element={<DetalleOrden/>}/>
+              <Route path='/detalleorden/:id' element={<DetalleOrden/>}/>
               <Route path='/detalleusuario' element={<DetalleUsuario/>}/>
               <Route path='/cambiarcontra' element={<CambiarContraseña/>}/>
               <Route path='/carrito' element={<CartPage/>}/>

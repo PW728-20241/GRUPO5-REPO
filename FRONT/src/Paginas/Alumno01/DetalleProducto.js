@@ -1,8 +1,8 @@
+import React, { useEffect, useState } from 'react';
 import { Container, Grid, Box, Typography, Button, Link } from '@mui/material';
 import Header1 from '../../Componentes/Header1';
 import Footer from '../../Componentes/Footer';
 import CantidadProducto from '../Alumno01/DETALLE/Cantidad';
-import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 const DetalleProducto = () => {
@@ -19,7 +19,6 @@ const DetalleProducto = () => {
           throw new Error('Error al obtener los datos del producto');
         }
         const data = await response.json();
-        // Asegúrate de actualizar imageUrl con la ruta completa del servidor si no lo has hecho ya
         setProduct({ ...data, imageUrl: `http://localhost:3100${data.imageUrl}` });
       } catch (error) {
         console.error('Error:', error);
@@ -34,10 +33,10 @@ const DetalleProducto = () => {
     localStorage.setItem('cartItems', JSON.stringify(cartItems));
     navigate('/carrito');
   };
+
   const aumentarCantidad = () => setCantidad(cantidad + 1);
   const disminuirCantidad = () => cantidad > 1 && setCantidad(cantidad - 1);
 
-  // Muestra un mensaje de carga si product es null
   if (!product) {
     return (
       <>
@@ -52,7 +51,6 @@ const DetalleProducto = () => {
     );
   }
 
-  // Verifica que product.caracteristicas sea un array antes de usar map
   const caracteristicasList = Array.isArray(product.caracteristicas) ? product.caracteristicas : [];
 
   return (

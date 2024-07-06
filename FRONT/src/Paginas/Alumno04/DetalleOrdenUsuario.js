@@ -1,40 +1,57 @@
-import React from 'react';
-import { Box, Container, CssBaseline, Drawer, List, ListItem, ListItemText, Typography, Paper, Grid, Radio, RadioGroup, FormControlLabel, Button } from '@mui/material';
-
-const drawerWidth = 240;
-
-const orderDetails = {
-  id: '12312312344',
-  shippingAddress: {
-    address: 'Jiron Huiracocha 2081 Departamento 922',
-    district: 'Jesús María, Lima',
-    city: 'Lima',
-    country: 'Perú'
-  },
-  paymentMethod: {
-    method: 'Tarjeta de crédito',
-    card: '****8859'
-  },
-  shippingMethod: 'Económico Aéreo - S/10.00',
-  items: [
-    { name: 'Juego de Cartas Pokemon Masters League', price: 'S/ 50.00' },
-    { name: 'Juego de Cartas Magic The Gathering', price: 'S/ 50.00' }
-  ],
-  summary: {
-    subtotal: 'S/ 100.00',
-    shipping: 'S/ 10.00',
-    taxes: 'S/ 18.00',
-    total: 'S/ 135.00'
-  }
-};
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Box, Container, CssBaseline, Paper, Typography, Grid, Radio, RadioGroup, FormControlLabel, Button } from '@mui/material';
 
 const DetalleOrden = () => {
+  const { id } = useParams(); // Obtener el ID de la orden de los parámetros de la URL
+  const [orderDetails, setOrderDetails] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchOrderDetails = async () => {
+      try {
+        const response = await fetch(`http://localhost:3100/orden/${id}`);
+        const data = await response.json();
+        setOrderDetails(data);
+      } catch (error) {
+        console.error('Error al obtener los detalles de la orden:', error);
+      }
+    };
+
+    fetchOrderDetails();
+  }, [id]);
+
+  const handleCancelOrder = async () => {
+    try {
+      const response = await fetch(`http://localhost:3100/orden/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        alert('Orden cancelada exitosamente');
+        navigate('/'); // Redirige a la página principal o cualquier otra página
+      } else {
+        alert('Error al cancelar la orden');
+      }
+    } catch (error) {
+      console.error('Error al cancelar la orden:', error);
+      alert('Error al cancelar la orden');
+    }
+  };
+
+  if (!orderDetails) {
+    return <Typography>Cargando detalles de la orden...</Typography>;
+  }
+
+  const { direccion, metodoPago, metodoEnvio, total, OrderProducts } = orderDetails;
+  const isCreditCard = metodoPago.length > 4;
+
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <Container component="main" sx={{ flexGrow: 1, p: 3 }}>
         <Typography variant="h6" gutterBottom>
-          Detalles de Orden Nro {orderDetails.id}
+          Detalles de Orden Nro {id}
         </Typography>
         <Paper sx={{ p: 2, mb: 2 }}>
           <Typography variant="body1" gutterBottom>
@@ -44,17 +61,13 @@ const DetalleOrden = () => {
             <Grid item xs={6}>
               <Typography variant="body2">
                 <strong>Dirección de Envío</strong><br />
-                {orderDetails.shippingAddress.address}<br />
-                {orderDetails.shippingAddress.district}<br />
-                {orderDetails.shippingAddress.city}<br />
-                {orderDetails.shippingAddress.country}
+                {direccion.join(', ')}
               </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body2">
                 <strong>Pago</strong><br />
-                Pago con {orderDetails.paymentMethod.method}<br />
-                Tarjeta de Crédito que termina en: {orderDetails.paymentMethod.card}
+                {isCreditCard ? `Pago con tarjeta de crédito que termina en: ****${metodoPago.slice(-4)}` : 'Pago con código QR'}
               </Typography>
             </Grid>
           </Grid>
@@ -63,9 +76,9 @@ const DetalleOrden = () => {
           <Typography variant="body1" gutterBottom>
             <strong>Método de Envío</strong>
           </Typography>
-          <RadioGroup value={orderDetails.shippingMethod}>
-            <FormControlLabel value="Económico Aéreo - S/10.00" control={<Radio />} label="Económico Aéreo - S/10.00" disabled />
-            <FormControlLabel value="Envío prioritario (5 a 10 días) - S/17.00" control={<Radio />} label="Envío prioritario (5 a 10 días) - S/17.00" disabled />
+          <RadioGroup value={metodoEnvio}>
+            <FormControlLabel value="economico" control={<Radio />} label="Económico Aéreo - S/10.00" disabled />
+            <FormControlLabel value="prioritario" control={<Radio />} label="Envío prioritario (5 a 10 días) - S/17.00" disabled />
           </RadioGroup>
         </Paper>
         <Paper sx={{ p: 2, mb: 2 }}>
@@ -74,9 +87,9 @@ const DetalleOrden = () => {
               <Typography variant="body1" gutterBottom>
                 <strong>Items en Pedido:</strong>
               </Typography>
-              {orderDetails.items.map((item, index) => (
+              {OrderProducts.map((item, index) => (
                 <Typography key={index} variant="body2">
-                  1x {item.name} - {item.price}
+                  {item.cantidad}x {item.Producto.nombre} - S/ {item.Producto.precio}
                 </Typography>
               ))}
             </Grid>
@@ -84,11 +97,11 @@ const DetalleOrden = () => {
               <Typography variant="body1" gutterBottom>
                 <strong>Resumen de Orden:</strong>
               </Typography>
-              <Typography variant="body2">Subtotal: {orderDetails.summary.subtotal}</Typography>
-              <Typography variant="body2">Envío: {orderDetails.summary.shipping}</Typography>
-              <Typography variant="body2">Impuestos: {orderDetails.summary.taxes}</Typography>
-              <Typography variant="body2"><strong>Total: {orderDetails.summary.total}</strong></Typography>
-              <Button variant="contained" color="secondary" sx={{ mt: 2 }}>Cancelar Pedido</Button>
+              <Typography variant="body2">Subtotal: S/ {total - (metodoEnvio === 'economico' ? 10 : 17) - (total * 0.18).toFixed(2)}</Typography>
+              <Typography variant="body2">Envío: S/ {metodoEnvio === 'economico' ? '10.00' : '17.00'}</Typography>
+              <Typography variant="body2">Impuestos: S/ {(total * 0.18).toFixed(2)}</Typography>
+              <Typography variant="body2"><strong>Total: S/ {total.toFixed(2)}</strong></Typography>
+              <Button variant="contained" color="secondary" sx={{ mt: 2 }} onClick={handleCancelOrder}>Cancelar Pedido</Button>
             </Grid>
           </Grid>
         </Paper>

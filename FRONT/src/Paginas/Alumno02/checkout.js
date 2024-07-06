@@ -1,10 +1,12 @@
-// src/pages/CheckoutPage.jsx
 import React, { useState, useEffect } from 'react';
 import { Container, Box, Typography, TextField, Button, Radio, RadioGroup, FormControlLabel, FormControl } from '@mui/material';
+import { useNavigate } from 'react-router-dom'; // Importa useNavigate
 import Header1 from '../../Componentes/Header1';
 import Footer from '../../Componentes/Footer';
 
 const CheckoutPage = () => {
+  const navigate = useNavigate(); // Usa useNavigate para la navegación
+
   const [shippingAddress, setShippingAddress] = useState({
     linea1: '',
     linea2: '',
@@ -53,8 +55,7 @@ const CheckoutPage = () => {
     setShippingMethod(e.target.value);
   };
 
-  const handleSubmit = () => {
-    // Validaciones
+  const handleSubmit = async () => {
     if (!shippingAddress.linea1 || !shippingAddress.distrito || !shippingAddress.ciudad || !shippingAddress.pais) {
       alert('Por favor, complete todos los campos de dirección.');
       return;
@@ -64,12 +65,28 @@ const CheckoutPage = () => {
       return;
     }
 
-    // Aquí se debería enviar la orden al servidor
-    console.log('Orden completada', { shippingAddress, paymentMethod, creditCard, cartItems, total });
+    try {
+      const response = await fetch('http://localhost:3100/orden', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ shippingAddress, paymentMethod, creditCard, cartItems, total, shippingMethod })
+      });
 
-    // Limpiar el carrito después de completar la orden
-    localStorage.removeItem('cartItems');
-    setCartItems([]);
+      if (response.ok) {
+        const result = await response.json();
+        localStorage.removeItem('cartItems');
+        setCartItems([]);
+        // Redirige a DetalleOrden con los detalles de la orden
+        navigate('/detalle-orden', { state: { orderDetails: { ...result, shippingAddress, paymentMethod, creditCard, cartItems, total, shippingMethod } } });
+      } else {
+        alert('Error al completar la orden');
+      }
+    } catch (error) {
+      console.error('Error al completar la orden:', error);
+      alert('Error al completar la orden');
+    }
   };
 
   return (

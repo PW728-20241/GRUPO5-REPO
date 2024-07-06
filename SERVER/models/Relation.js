@@ -13,4 +13,10 @@ Producto.belongsTo(Serie, { foreignKey: 'serieId' });
 Orden.belongsToMany(Producto, { through: OrderProduct, foreignKey: 'ordenId' });
 Producto.belongsToMany(Orden, { through: OrderProduct, foreignKey: 'productoId' });
 
+OrderProduct.belongsTo(Orden, { foreignKey: 'ordenId' });
+OrderProduct.belongsTo(Producto, { foreignKey: 'productoId' });
+
+Orden.hasMany(OrderProduct, { foreignKey: 'ordenId' });
+Producto.hasMany(OrderProduct, { foreignKey: 'productoId' });
+
 export { Usuario, Producto, Serie, Orden, OrderProduct };

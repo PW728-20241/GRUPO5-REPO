@@ -505,42 +505,89 @@ app.post('/recuperarPassword', async (req, res) => {
 /*
 ENDPOINTS PARA ORDENES
 */
-// Crear una nueva orden
-app.post('/ordenes', async (req, res) => {
-    const { fechaOrden, total, estado, metodoEnvio, metodoPago, direccion } = req.body;
-    
+app.post('/orden', async (req, res) => {
+    const { shippingAddress, paymentMethod, creditCard, cartItems, total, shippingMethod } = req.body;
+
     try {
+        let metodoPago;
+        if (paymentMethod === 'tarjeta') {
+            metodoPago = creditCard.numeroTarjeta;
+        } else {
+            metodoPago = paymentMethod; // Esto será 'qr'
+        }
+
         const nuevaOrden = await Orden.create({
-            fechaOrden,
+            fechaOrden: new Date(),
             total,
-            estado,
-            metodoEnvio,
+            estado: 'pendiente',
+            metodoEnvio: shippingMethod,
             metodoPago,
-            direccion
+            direccion: [
+                shippingAddress.linea1,
+                shippingAddress.linea2,
+                shippingAddress.distrito,
+                shippingAddress.ciudad,
+                shippingAddress.pais
+            ]
         });
 
-        res.status(201).json(nuevaOrden);
+        for (const item of cartItems) {
+            await OrderProduct.create({
+                ordenId: nuevaOrden.id,
+                productoId: item.id,
+                cantidad: item.cantidad
+            });
+        }
+
+        res.status(201).json({ message: 'Orden creada exitosamente', ordenId: nuevaOrden.id });
     } catch (error) {
-        console.error('Error creando la orden:', error);
-        res.status(500).json({ error: 'Error interno al crear la orden' });
+        console.error('Error al crear la orden:', error);
+        res.status(500).json({ message: 'Error al crear la orden' });
     }
 });
+// Crear una nueva orden
 
 // Obtener una orden por ID
-app.get('/ordenes/:id', async (req, res) => {
+app.get('/orden/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const orden = await Orden.findByPk(id, {
+            include: [
+                {
+                    model: OrderProduct,
+                    include: [Producto]
+                }
+            ]
+        });
+
+        if (!orden) {
+            return res.status(404).json({ message: 'Orden no encontrada' });
+        }
+
+        res.json(orden);
+    } catch (error) {
+        console.error('Error al obtener la orden:', error);
+        res.status(500).json({ message: 'Error al obtener la orden' });
+    }
+});
+app.delete('/orden/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
         const orden = await Orden.findByPk(id);
 
         if (!orden) {
-            return res.status(404).json({ error: 'Orden no encontrada' });
+            return res.status(404).json({ message: 'Orden no encontrada' });
         }
 
-        res.json(orden);
+        await OrderProduct.destroy({ where: { ordenId: id } });
+        await orden.destroy();
+
+        res.status(200).json({ message: 'Orden cancelada exitosamente' });
     } catch (error) {
-        console.error('Error obteniendo la orden:', error);
-        res.status(500).json({ error: 'Error interno al obtener la orden' });
+        console.error('Error al cancelar la orden:', error);
+        res.status(500).json({ message: 'Error al cancelar la orden' });
     }
 });
 
@@ -569,26 +616,6 @@ app.put('/ordenes/:id', async (req, res) => {
     } catch (error) {
         console.error('Error actualizando la orden:', error);
         res.status(500).json({ error: 'Error interno al actualizar la orden' });
-    }
-});
-
-// Eliminar una orden por ID
-app.delete('/ordenes/:id', async (req, res) => {
-    const { id } = req.params;
-
-    try {
-        const orden = await Orden.findByPk(id);
-
-        if (!orden) {
-            return res.status(404).json({ error: 'Orden no encontrada' });
-        }
-
-        await orden.destroy();
-
-        res.json({ message: 'Orden eliminada' });
-    } catch (error) {
-        console.error('Error eliminando la orden:', error);
-        res.status(500).json({ error: 'Error interno al eliminar la orden' });
     }
 });
 
@@ -803,11 +830,7 @@ app.post('/guardarParaDespues', (req, res) => {
     }
   });
   
-  app.post('/ordenes', (req, res) => {
-    const nuevaOrden = { id: uuidv4(), ...req.body };
-    ordenes.push(nuevaOrden);
-    res.json(nuevaOrden);
-  });
+
   
 /**ENDPOINTS PARA LA BASE DE DATOS EN POSTGRES */
 
