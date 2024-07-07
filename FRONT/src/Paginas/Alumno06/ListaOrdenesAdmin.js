@@ -6,14 +6,11 @@ import Footer from '../../Componentes/Footer';
 import RellenarOrden from './ContenidoTablaOrdenes';
 import { useNavigate } from 'react-router-dom';
 
-const drawerWidth = 240;
-
 const ListaOrdenesAdmin = () => {
   const [pagina, setPagina] = useState(1);
   const [filasPorPagina, setFilasPorPagina] = useState(5);
   const [data, setData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-
   const navigate = useNavigate();
 
   async function obtenerOrdenes(query = "") {
@@ -22,10 +19,13 @@ const ListaOrdenesAdmin = () => {
       const res = await fetch(url_base);
       if (res.status === 200) {
         const data = await res.json();
-        setData(Array.isArray(data) ? data : [data]); // Si es un arreglo, lo asigna directamente, si no, lo convierte en un arreglo de un solo elemento
+        setData(Array.isArray(data) ? data : [data]);
+      } else if (res.status === 404) {
+        alert("Orden no encontrada");
+        setData([]);
       } else {
-        alert("La orden no existe");
-        setData([]); // Limpiar los datos si no se encuentra la orden
+        alert("Error al buscar la orden");
+        setData([]);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -55,9 +55,6 @@ const ListaOrdenesAdmin = () => {
             <Typography variant="h4" style={{ fontWeight: 'bold' }} gutterBottom>
               Lista de Órdenes
             </Typography>
-            <Button variant="contained" style={{ backgroundColor: '#FFEB3B', color: 'black', fontWeight: 'bold' }}>
-              Agregar Orden
-            </Button>
           </Box>
           <TextField
             fullWidth

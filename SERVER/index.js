@@ -422,22 +422,51 @@ app.get("/usuarios/detalle/:id", async (req, res) => {
     }
 });
 
+/**NOS MUESTRA LAS ORDENES HECHAS POR UN USUARIO EN ESPECIFICO*/
+app.get('/usuario/:id/ordenes', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const ordenes = await Orden.findAll({
+            where: { usuarioId: id },
+            attributes: ['id', 'fechaOrden', 'total', 'estado'], 
+            include: [
+                {
+                    model: OrderProduct,
+                    attributes: ['cantidad'],
+                    include: {
+                        model: Producto,
+                        attributes: []
+                    }
+                },
+                {
+                    model: Usuario,
+                    attributes: ['id']
+                }
+            ]
+        });
+        res.json(ordenes);
+    } catch (error) {
+        console.error('Error al obtener órdenes del usuario:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+});
+
 /** NOS MUESTRA TODA LA LISTA DE ORDENES USANDO UN ATRIBUTO DE LA TABLA DE USUARIOS*/
 app.get("/ordenes", async (req, res) => {
     try {
         const ordenes = await Orden.findAll({
             attributes: [
                 'id',
-                [sequelize.literal(`"Usuario"."nombre" || ' ' || "Usuario"."apellido"`), 'nombreUsuario'], //ESTO SIRVE PARA PODER HACER UNA SENTENCIA SQL :)
-                'fechaOrden', 
-                'total', 
-                [sequelize.col('Usuario.correo'), 'correoUsuario'], 
-                'estado' 
+                [sequelize.literal(`"Usuario"."nombre" || ' ' || "Usuario"."apellido"`), 'nombreUsuario'], // PERMITE UNIR EL NOMBRE Y APELLIDO MEDIANTE CONSULTA SQL
+                'fechaOrden',
+                'total',
+                [sequelize.col('Usuario.correo'), 'correoUsuario'],
+                'estado'
             ],
             include: [
                 {
                     model: Usuario,
-                    attributes: [] // AQUI SE INCLUYE LOS ATRIBUTOS QUE COLECTAMOS COMO LISTA AAAA
+                    attributes: [] 
                 }
             ]
         });
@@ -452,12 +481,6 @@ app.get("/ordenes", async (req, res) => {
     }
 });
 
-/*
-app.get('/ordenes', async function(req,res){
-    const ordenes = await Orden.findAll();
-        res.json(ordenes);
-});
-*/
 /**SIRVE PARA BUSCAR UNA ORDEN DE ACUERDO A ID **/
 app.get('/ordenes/:id', async function(req, res) {
     const { id } = req.params;

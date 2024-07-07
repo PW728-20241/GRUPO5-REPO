@@ -19,7 +19,7 @@ function DetalleUsuarioAdmin() {
                     setUsuario(data);
                 } else {
                     console.error('Error fetching user:', res.status);
-                    setUsuario(null); 
+                    setUsuario(null);
                 }
             } catch (error) {
                 console.error("Error fetching user:", error);
@@ -29,7 +29,7 @@ function DetalleUsuarioAdmin() {
 
         const fetchOrdenes = async () => {
             try {
-                const res = await fetch(`http://localhost:3100/ordenes-url?usuarioId=${id}`);
+                const res = await fetch(`http://localhost:3100/usuario/${id}/ordenes`);
                 if (res.ok) {
                     const data = await res.json();
                     setOrdenes(data);
@@ -39,7 +39,7 @@ function DetalleUsuarioAdmin() {
                 }
             } catch (error) {
                 console.error("Error fetching orders:", error);
-                setOrdenes([]); 
+                setOrdenes([]);
             }
         };
 
@@ -47,7 +47,7 @@ function DetalleUsuarioAdmin() {
             fetchUsuario();
             fetchOrdenes();
         }
-    }, [id]); 
+    }, [id]);
 
     return (
         <>
@@ -84,7 +84,6 @@ function DetalleUsuarioAdmin() {
                                         <TableCell>ID</TableCell>
                                         <TableCell>Fecha de Orden</TableCell>
                                         <TableCell>Total</TableCell>
-                                        <TableCell>Productos</TableCell>
                                         <TableCell>Estado</TableCell>
                                         <TableCell>Acciones</TableCell>
                                     </TableRow>
@@ -95,17 +94,16 @@ function DetalleUsuarioAdmin() {
                                             <TableCell>{orden.id}</TableCell>
                                             <TableCell>{orden.fechaOrden}</TableCell>
                                             <TableCell>{orden.total}</TableCell>
-                                            <TableCell>{orden.productos}</TableCell>
                                             <TableCell>{orden.estado}</TableCell>
                                             <TableCell>
-                                                <Link href="#" underline="hover">
-                                                    Ver
+                                                <Link href={`/detalleorden/${orden.id}`} underline="hover">
+                                                    Ver Detalle
                                                 </Link>
                                             </TableCell>
                                         </TableRow>
                                     )) : (
                                         <TableRow>
-                                            <TableCell colSpan={6} style={{ textAlign: 'center' }}>
+                                            <TableCell colSpan={5} style={{ textAlign: 'center' }}>
                                                 No hay órdenes disponibles
                                             </TableCell>
                                         </TableRow>
