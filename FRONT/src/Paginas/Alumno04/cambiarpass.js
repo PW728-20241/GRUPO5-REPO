@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Container,
@@ -6,12 +6,51 @@ import {
   Button,
   Typography,
   Paper,
-  List,
-  ListItem,
-  ListItemText,
 } from "@mui/material";
 
 const ChangePassword = () => {
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [repeatPassword, setRepeatPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handlePasswordChange = async () => {
+    if (newPassword !== repeatPassword) {
+      setError('Las contraseñas no coinciden');
+      return;
+    }
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    const userId = user ? user.id : null;
+    if (!userId) {
+      alert('No estás logueado');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3100/usuarios/${userId}/cambiar-password`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ currentPassword, newPassword })
+      });
+
+      if (response.ok) {
+        alert('Contraseña actualizada correctamente');
+        // Actualizar la contraseña en el localStorage
+        user.password = newPassword;
+        localStorage.setItem('user', JSON.stringify(user));
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message);
+      }
+    } catch (error) {
+      console.error('Error al cambiar la contraseña:', error);
+      setError('Error al cambiar la contraseña');
+    }
+  };
+
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>
       <Paper
@@ -23,7 +62,7 @@ const ChangePassword = () => {
           margin: "auto"
         }}
       >
-         <Typography
+        <Typography
           variant="h6"
           gutterBottom
           sx={{ 
@@ -46,6 +85,8 @@ const ChangePassword = () => {
             fullWidth
             margin="normal"
             variant="outlined"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
           />
           <TextField
             label="Nuevo"
@@ -53,6 +94,8 @@ const ChangePassword = () => {
             fullWidth
             margin="normal"
             variant="outlined"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
           />
           <TextField
             label="Repetir"
@@ -60,8 +103,15 @@ const ChangePassword = () => {
             fullWidth
             margin="normal"
             variant="outlined"
+            value={repeatPassword}
+            onChange={(e) => setRepeatPassword(e.target.value)}
           />
-          <Box textAlign="center"> {/* Aquí se ha añadido el estilo para centrar */}
+          {error && (
+            <Typography sx={{ color: 'red', mt: 2 }}>
+              {error}
+            </Typography>
+          )}
+          <Box textAlign="center">
             <Button
               variant="contained"
               fullWidth
@@ -72,6 +122,7 @@ const ChangePassword = () => {
                 width: "50%",
                 textAlign: "center",
               }}
+              onClick={handlePasswordChange}
             >
               Cambiar
             </Button>
@@ -81,6 +132,5 @@ const ChangePassword = () => {
     </Container>
   );
 };
-
 
 export default ChangePassword;

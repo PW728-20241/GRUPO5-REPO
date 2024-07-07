@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -6,12 +6,57 @@ import {
   Button,
   Typography,
   Paper,
-  List,
-  ListItem,
-  ListItemText,
 } from "@mui/material";
 
 const Detalle = () => {
+  const [userData, setUserData] = useState({
+    nombre: '',
+    apellido: '',
+    correo: ''
+  });
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+      setUserData(user);
+    } else {
+      alert('No estás logueado');
+    }
+  }, []);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setUserData({
+      ...userData,
+      [name]: value
+    });
+  };
+
+  const handleUpdate = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch(`http://localhost:3100/usuarios/${userData.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(userData)
+      });
+
+      if (response.ok) {
+        const updatedUser = await response.json();
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        alert('Datos actualizados correctamente');
+      } else {
+        alert('Error al actualizar los datos');
+      }
+    } catch (error) {
+      console.error('Error al actualizar los datos:', error);
+      alert('Error al actualizar los datos');
+    }
+  };
+
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>
       <Paper
@@ -23,7 +68,7 @@ const Detalle = () => {
           margin: "auto"
         }}
       >
-         <Typography
+        <Typography
           variant="h6"
           gutterBottom
           sx={{ 
@@ -42,26 +87,35 @@ const Detalle = () => {
         <Box component="form" gap={4} p={2} noValidate autoComplete="off">
           <TextField
             label="Nombre"
+            name="nombre"
             type="text"
             fullWidth
             margin="normal"
             variant="outlined"
+            value={userData.nombre}
+            onChange={handleInputChange}
           />
           <TextField
-            label="Apellidos"
+            label="Apellido"
+            name="apellido"
             type="text"
             fullWidth
             margin="normal"
             variant="outlined"
+            value={userData.apellido}
+            onChange={handleInputChange}
           />
           <TextField
             label="Correo"
+            name="correo"
             type="email"
             fullWidth
             margin="normal"
             variant="outlined"
+            value={userData.correo}
+            onChange={handleInputChange}
           />
-          <Box textAlign="center"> {/* Aquí se ha añadido el estilo para centrar */}
+          <Box textAlign="center">
             <Button
               variant="contained"
               fullWidth
@@ -72,6 +126,7 @@ const Detalle = () => {
                 width: "50%",
                 textAlign: "center",
               }}
+              onClick={handleUpdate}
             >
               Actualizar
             </Button>
@@ -81,6 +136,5 @@ const Detalle = () => {
     </Container>
   );
 };
-
 
 export default Detalle;

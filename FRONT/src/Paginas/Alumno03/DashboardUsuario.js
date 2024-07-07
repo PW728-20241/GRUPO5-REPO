@@ -1,94 +1,150 @@
-// FRONT/src/Paginas/Alumno03/DashboardUsuario.js
-
-import React, { useState, useEffect } from 'react';
-import { Container, Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Select, MenuItem, FormControl, InputLabel, Pagination, Link } from '@mui/material';
-import Header from '../../Componentes/Header1';
+import React, { useEffect, useState } from 'react';
+import { Box, Button, Container, CssBaseline, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, TextField, Pagination } from '@mui/material';
+import BarraLateral2 from '../../Componentes/BarraLateral1';
+import Header2 from '../../Componentes/Header2';
 import Footer from '../../Componentes/Footer';
+import { useNavigate } from 'react-router-dom';
 
-const ordenesMock = [
-    { id: 1, fecha: '2024-06-30', total: 100, estado: 'Completada', detalle: 'Orden x3 Items (Juego de cartas, juego de cartas...)', direccion: 'Jiron Huascar 123, Jesus Maria, Lima, Peru', numeroOrden: '12345232' },
-    { id: 2, fecha: '2024-07-01', total: 200, estado: 'Pendiente', detalle: 'Orden x4 Items (Pokemon Red, Pokemon Blue, Ghost of Tsushima)', direccion: 'Jiron Huascar 123, Jesus Maria, Lima, Peru', numeroOrden: '12345232' }
-];
+const ListaOrdenesusuario = () => {
+  const [pagina, setPagina] = useState(1);
+  const [filasPorPagina, setFilasPorPagina] = useState(5); 
+  const [data, setData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
-const DashboardUsuario = () => {
-    const [ordenes, setOrdenes] = useState([]);
-    const [paginaActual, setPaginaActual] = useState(1);
-    const [ordenarPor, setOrdenarPor] = useState('fecha');
+  async function obtenerOrdenes() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const usuarioId = user ? user.id : null;
+    if (!usuarioId) {
+      alert('No estás logueado');
+      return;
+    }
+    const url_base = `http://localhost:3100/ordenes?usuarioId=${usuarioId}`;
+    try {
+      const res = await fetch(url_base);
+      if (res.status === 200) {
+        const data = await res.json();
+        setData(data);
+      } else {
+        alert("Error al obtener las órdenes");
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  }
 
-    useEffect(() => {
-        setOrdenes(ordenesMock);
-    }, []);
+  useEffect(() => {
+    obtenerOrdenes();
+  }, []);
 
-    const handleChangePage = (event, newPage) => {
-        setPaginaActual(newPage);
-    };
+  const handleSearch = () => {
+    obtenerOrdenes(searchQuery);
+  };
 
-    const handleOrdenarPor = (event) => {
-        setOrdenarPor(event.target.value);
-        // Implementar lógica de ordenamiento si es necesario
-    };
+  const handleDesactivarOrden = async (ordenId) => {
+    try {
+      const response = await fetch(`http://localhost:3100/ordenes/${ordenId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (response.status === 200) {
+        alert("Esta orden ha sido desactivada");
+        obtenerOrdenes();
+      } else {
+        alert("Error al desactivar la orden");
+      }
+    } catch (error) {
+      console.error("Error al desactivar la orden:", error);
+    }
+  };
 
-    return (
-        <>
-            <Header />
-            <Container maxWidth="lg" sx={{ display: 'flex', marginTop: 4 }}>
-                <Box sx={{ width: '20%', paddingRight: 2 }}>
-                    <Typography variant="h6">Mi Cuenta</Typography>
-                    <Box sx={{ marginTop: 2 }}>
-                        <Link href="/ordenes-recientes" sx={{ display: 'block', marginBottom: 1 }}>Órdenes Recientes</Link>
-                        <Link href="/datos-de-registro" sx={{ display: 'block', marginBottom: 1 }}>Datos de Registro</Link>
-                        <Link href="/cambiar-password" sx={{ display: 'block', marginBottom: 1 }}>Cambiar Password</Link>
-                    </Box>
-                </Box>
-                <Box sx={{ width: '80%' }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
-                        <Typography variant="h6">Órdenes Recientes</Typography>
-                        <FormControl variant="outlined" sx={{ minWidth: 200 }}>
-                            <InputLabel>Ordenar por</InputLabel>
-                            <Select value={ordenarPor} onChange={handleOrdenarPor} label="Ordenar por">
-                                <MenuItem value="fecha">Fecha (más recientes primero)</MenuItem>
-                                <MenuItem value="fechaAsc">Fecha (más antiguas primero)</MenuItem>
-                                <MenuItem value="totalDesc">Total (mayor a menor)</MenuItem>
-                                <MenuItem value="totalAsc">Total (menor a mayor)</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Box>
-                    <TableContainer component={Paper}>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Detalle</TableCell>
-                                    <TableCell>Fecha</TableCell>
-                                    <TableCell>Total</TableCell>
-                                    <TableCell>Estado</TableCell>
-                                    <TableCell>Número de Orden</TableCell>
-                                    <TableCell>Acción</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {ordenes.map((orden) => (
-                                    <TableRow key={orden.id}>
-                                        <TableCell>{orden.detalle}</TableCell>
-                                        <TableCell>{orden.fecha}</TableCell>
-                                        <TableCell>S/ {orden.total}</TableCell>
-                                        <TableCell>{orden.estado}</TableCell>
-                                        <TableCell>{orden.numeroOrden}</TableCell>
-                                        <TableCell>
-                                            <Link href={`/detalle-orden/${orden.id}`} color="primary">Ver Detalle</Link>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                    <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 4 }}>
-                        <Pagination count={10} page={paginaActual} onChange={handleChangePage} />
-                    </Box>
-                </Box>
-            </Container>
-            <Footer />
-        </>
-    );
+  const handleChangePagina = (event, nuevaPagina) => {
+    setPagina(nuevaPagina);
+  };
+
+  return (
+    <>
+      <Header2 />
+      <Box sx={{ display: 'flex' }}>
+        <CssBaseline />
+        <BarraLateral2 />
+        <Container component="main" sx={{ flexGrow: 1, p: 3 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Typography variant="h4" style={{ fontWeight: 'bold' }} gutterBottom>
+              Lista de Órdenes
+            </Typography>
+            <Button variant="contained" style={{ backgroundColor: '#FFEB3B', color: 'black', fontWeight: 'bold' }}>
+              Agregar Orden
+            </Button>
+          </Box>
+          <TextField
+            fullWidth
+            margin="normal"
+            variant="outlined"
+            placeholder="Buscar por ID de orden..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            InputProps={{
+              endAdornment: (
+                <Button
+                  type="button"
+                  onClick={handleSearch}
+                  variant="contained"
+                  style={{ backgroundColor: '#FFEB3B', color: 'black', fontWeight: 'bold' }}
+                >
+                  Buscar
+                </Button>
+              ),
+            }}
+          />
+          <Paper>
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell style={{ textAlign: 'center' }}>ID</TableCell>
+                    <TableCell style={{ textAlign: 'center' }}>Fecha de Orden</TableCell>
+                    <TableCell style={{ textAlign: 'center' }}>Monto total</TableCell>
+                    <TableCell style={{ textAlign: 'center' }}>Estado</TableCell>
+                    <TableCell style={{ textAlign: 'center' }}>Acciones</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {data.slice((pagina - 1) * filasPorPagina, pagina * filasPorPagina).map((orden) => (
+                    <TableRow key={orden.id}>
+                      <TableCell style={{ textAlign: 'center' }}>{orden.id}</TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>{new Date(orden.fechaOrden).toLocaleDateString()}</TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>{orden.total}</TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>{orden.estado}</TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>
+                        <Button variant="contained" color="secondary" onClick={() => handleDesactivarOrden(orden.id)}>
+                          Desactivar
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <Box display="flex" justifyContent="space-between" alignItems="center" padding="16px">
+              <Typography variant="body2">Anterior</Typography>
+              <Pagination
+                count={Math.ceil(data.length / filasPorPagina)}
+                page={pagina}
+                onChange={handleChangePagina}
+                shape="rounded"
+                color="primary"
+              />
+              <Typography variant="body2">Siguiente</Typography>
+            </Box>
+          </Paper>
+        </Container>
+      </Box>
+      <Footer />
+    </>
+  );
 };
 
-export default DashboardUsuario;
+export default ListaOrdenesusuario;

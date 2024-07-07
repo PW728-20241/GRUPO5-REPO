@@ -9,7 +9,7 @@ const Sidebar = () => {
         <ListItem>
           <ListItemText primary="Mi Cuenta" sx={{ textAlign: 'center' }} />
         </ListItem>
-        <ListItem button component={Link} to="/ordenes" sx={{ p: 1 }}>
+        <ListItem button component={Link} to="/Listaordenesusuario" sx={{ p: 1 }}>
           <ListItemText primary="Órdenes Recientes" sx={{ textAlign: 'center' }} />
         </ListItem>
         <ListItem button component={Link} to="/detalleusuario" sx={{ p: 1 }} >

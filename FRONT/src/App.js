@@ -23,6 +23,7 @@ import RecuperarPassword from './Paginas/Alumno03/RecuperarPassword';
 import ListadoSeries from './Paginas/Alumno04/LSA';
 import PrivateRoute from './Componentes/PrivateRoute';
 import DashboardUsuario from './Paginas/Alumno03/DashboardUsuario';
+import ListaOrdenesusuario from './Paginas/Alumno03/DashboardUsuario';
 import { AuthProvider } from './Componentes/AuthContext';
 
 import AcercaDeNosotros from './Componentes/AcercadeNosotros';
@@ -48,12 +49,13 @@ function App (){
               <Route path='/ListaSeries' element={<ListadoSeries/>}/>
               <Route path='/ver/serie/:id' element={<SeriesDetail/>}/>
               <Route path='/crear-serie' element={<CreateSerie/>}/>
-              <Route path='/detalleorden/:id' element={<DetalleOrden/>}/>
+              <Route path='/ordenes/:id' element={<DetalleOrden/>}/>
               <Route path='/detalleusuario' element={<DetalleUsuario/>}/>
               <Route path='/cambiarcontra' element={<CambiarContraseña/>}/>
               <Route path='/carrito' element={<CartPage/>}/>
               <Route path='/graciascompra' element={<ThankYouPage/>}/>
               <Route path='/carritocompra' element={<CartPage/>}/>
+              <Route path='/Listaordenesusuario' element={<ListaOrdenesusuario/>}/>
               <Route 
               path='/checkout' 
               element={

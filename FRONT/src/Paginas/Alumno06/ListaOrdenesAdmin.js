@@ -19,7 +19,7 @@ const ListaOrdenes = () => {
   const navigate = useNavigate();
 
   async function obtenerOrdenes(query=""){
-    const url_base = "http://localhost:3100/ordenes";
+    const url_base = "http://localhost:3100/ordenes1";
     const url = query ? `${url_base}-url?id=${query}&usuarioId=${query}` : url_base; 
     try {
       const res = await fetch(url);
@@ -45,7 +45,7 @@ const ListaOrdenes = () => {
   // Función para desactivar una orden
   const handleDesactivarOrden = async (ordenId) => {
     try {
-      const response = await fetch(`http://localhost:3100/ordenes/${ordenId}`, {
+      const response = await fetch(`http://localhost:3100/ordenes1/${ordenId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

@@ -19,5 +19,5 @@ const CambiarContraseña = () => {
     </>
   );
 };
-
+  
 export default CambiarContraseña;

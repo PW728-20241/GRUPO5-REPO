@@ -9,7 +9,7 @@ import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Slide from '@mui/material/Slide';
 import Grow from '@mui/material/Grow';
-import { AuthContext } from './AuthContext'; // Importa el AuthContext
+import { AuthContext } from './AuthContext';
 
 const Barra = styled('div')(({ theme }) => ({
   flexGrow: 1,
@@ -42,7 +42,7 @@ const Navegar = styled(Button)(({ theme }) => ({
 
 const Header1 = () => {
   const navigate = useNavigate();
-  const { user, logout } = useContext(AuthContext); // Usa el contexto de autenticación
+  const { user, logout } = useContext(AuthContext);
 
   const handleNavigate = (path, section) => {
     navigate(path);
@@ -50,6 +50,14 @@ const Header1 = () => {
       setTimeout(() => {
         document.getElementById(section)?.scrollIntoView({ behavior: 'smooth' });
       }, 0);
+    }
+  };
+
+  const handleAccountClick = () => {
+    if (user.correo === 'admin@ejemplo.com' && user.password === 'admin') {
+      navigate('/Dashboard');
+    } else {
+      navigate('/Listaordenesusuario');
     }
   };
 
@@ -93,7 +101,7 @@ const Header1 = () => {
                   <Button
                     variant="contained"
                     sx={{ marginLeft: 2, backgroundColor: '#fbbd08', color: '#ffffff' }}
-                    onClick={() => navigate('/dashboard')}
+                    onClick={handleAccountClick}
                   >
                     Mi Cuenta
                   </Button>

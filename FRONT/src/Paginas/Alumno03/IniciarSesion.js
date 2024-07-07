@@ -26,10 +26,17 @@ const IniciarSesion = () => {
 
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem('user', JSON.stringify(data.user));  // Guardar información del usuario
-        login(data.user);
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user)); // Guardar la información del usuario
+        login({ ...data.user, token: data.token });
         alert(data.message);
-        navigate('/');
+
+        // Redirigir al dashboard correspondiente según el correo y la contraseña
+        if (correo === 'admin@ejemplo.com' && password === 'admin') {
+          navigate('/Dashboard');
+        } else {
+          navigate('/');
+        }
       } else {
         const errorData = await response.json();
         setError(errorData.message);
