@@ -943,34 +943,6 @@ app.post("/moverAlCarrito", (req, res) => {
   res.json({ carrito, guardadosParaDespues });
 });
 
-const ordenes1 = [];
-
-app.get("/productos", (req, res) => {
-  res.json(productos);
-});
-
-app.get("/producto/id/:id", (req, res) => {
-  const { id } = req.params;
-  const producto = productos.find((p) => p.id == id);
-  if (producto) {
-    res.json(producto);
-  } else {
-    res.status(404).send("Producto no encontrado");
-  }
-});
-
-/**ENDPOINTS PARA LA BASE DE DATOS EN POSTGRES */
-
-/*async function verificacionConexion() {
-    try {
-        await sequelize.authenticate();
-        console.log("Conexion satisfactoria con la Base de Datos");
-        await sequelize.sync();
-    }
-    catch(error) {
-        console.error("No se puede conectar a la Base de Datos", error);
-    }
-}*/
 
 app.listen(port, function () {
   console.log("Servidor escuchando en el puerto " + port);
