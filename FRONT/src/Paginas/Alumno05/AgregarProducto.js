@@ -1,12 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { Box, Button, Container, Grid, Paper, Typography, CssBaseline, TextField } from '@mui/material';
 import Header from '../../Componentes/Header2';
 import Footer from '../../Componentes/Footer';
 import BarLateral from '../../Componentes/BarraLateral2';
+import { Link as RouterLink } from 'react-router-dom';
 
-function AgregarProducto() {
-    const [previewImage, setPreviewImage] = useState(null);
-    const [imagenBase64, setImagenBase64] = useState(null);
+const AgregarProducto = () => {
 
     const manejarGuardar = async () => {
         const nombre = document.getElementById('nombre').value;
@@ -15,6 +14,7 @@ function AgregarProducto() {
         const editor = document.getElementById('editor').value;
         const precio = parseFloat(document.getElementById('precio').value);
         const stock = parseInt(document.getElementById('stock').value);
+        const imagen = document.getElementById('imagen').files[0];
 
         const nuevoProducto = { 
             nombre, 
@@ -23,7 +23,7 @@ function AgregarProducto() {
             editor, 
             precio, 
             stock, 
-            imagenBase64
+            imageUrl: '' 
         };
 
         try {
@@ -46,18 +46,6 @@ function AgregarProducto() {
         }
     };
 
-    const handleImageChange = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setPreviewImage(reader.result);
-                setImagenBase64(reader.result.split(',')[1]); // Guarda solo la parte base64 de la imagen
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
     return (
         <>
             <Header />
@@ -72,14 +60,10 @@ function AgregarProducto() {
                         <Grid container spacing={2}>
                             <Grid item xs={12} md={6}>
                                 <Paper variant="outlined" sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    {previewImage ? (
-                                        <img src={previewImage} alt="Vista previa" style={{ maxHeight: '100%', maxWidth: '100%' }} />
-                                    ) : (
-                                        <Button variant="contained" component="label" style={{ backgroundColor: '#FFEB3B', color: 'black', fontWeight: 'bold' }}>
-                                            Agregar Imagen
-                                            <input type="file" hidden id="imagen" onChange={handleImageChange} />
-                                        </Button>
-                                    )}
+                                    <Button variant="contained" component="label" style={{ backgroundColor: '#FFEB3B', color: 'black', fontWeight: 'bold' }}>
+                                        Agregar Imagen
+                                        <input type="file" hidden id="imagen" />
+                                    </Button>
                                 </Paper>
                             </Grid>
                             <Grid item xs={12} md={6}>
@@ -100,7 +84,7 @@ function AgregarProducto() {
                                     </Grid>
                                 </Grid>
                                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
-                                    <Button variant="contained" style={{ backgroundColor: '#FFEB3B', color: 'black', fontWeight: 'bold' }} onClick={manejarGuardar}>
+                                    <Button variant="contained" style={{ backgroundColor: '#FFEB3B', color: 'black', fontWeight: 'bold' }} onClick={manejarGuardar} component={RouterLink} to={`/AdminProducto`}>
                                         Guardar
                                     </Button>
                                 </Box>
