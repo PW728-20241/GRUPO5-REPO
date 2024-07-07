@@ -1,60 +1,57 @@
-import React from 'react';
-import { Box, Container, CssBaseline, Drawer, List, ListItem, ListItemText, Typography, Paper, Grid, Radio, RadioGroup, FormControlLabel, Button } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Box, Container, CssBaseline, Paper, Typography, Grid, Radio, RadioGroup, FormControlLabel, Button } from '@mui/material';
 
-const drawerWidth = 240;
+const DetalleOrdenAdmin = () => {
+  const { id } = useParams();
+  const [detalleOrden, setDetalleOrden] = useState(null);
+  const navigate = useNavigate();
 
-const detallesOrden = {
-  id: '12312312344',
-  direccionEnvio: {
-    direccion: 'Jiron Huiracocha 2081 Departamento 922',
-    distrito: 'Jesús María, Lima',
-    ciudad: 'Lima',
-    pais: 'Perú'
-  },
-  metodoPago: {
-    metodo: 'Tarjeta de crédito',
-    tarjeta: '****8859'
-  },
-  metodoEnvio: 'Económico Aéreo - S/10.00',
-  items: [
-    { nombre: 'Juego de Cartas Pokemon Masters League', precio: 'S/ 50.00' },
-    { nombre: 'Juego de Cartas Magic The Gathering', precio: 'S/ 50.00' }
-  ],
-  resumen: {
-    subtotal: 'S/ 100.00',
-    envio: 'S/ 10.00',
-    impuestos: 'S/ 18.00',
-    total: 'S/ 135.00'
+  useEffect(() => {
+    const fetchDetalleOrden = async () => {
+      try {
+        const response = await fetch(`http://localhost:3100/orden/${id}`);
+        const data = await response.json();
+        setDetalleOrden(data);
+      } catch (error) {
+        console.error('Error al obtener los detalles de la orden:', error);
+      }
+    };
+
+    fetchDetalleOrden();
+  }, [id]);
+
+  const handleCancelarOrden = async () => {
+    try {
+      const response = await fetch(`http://localhost:3100/orden/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        alert('Orden cancelada exitosamente');
+        navigate('/');
+      } else {
+        alert('Error al cancelar la orden');
+      }
+    } catch (error) {
+      console.error('Error al cancelar la orden:', error);
+      alert('Error al cancelar la orden');
+    }
+  };
+
+  if (!detalleOrden) {
+    return <Typography>Cargando detalles de la orden...</Typography>;
   }
-};
 
-const DetalleOrden = () => {
+  const { direccion, metodoPago, metodoEnvio, total, OrderProducts } = detalleOrden;
+  const isCreditCard = metodoPago.length > 4;
+
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <Drawer
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            width: drawerWidth,
-            boxSizing: 'border-box',
-          },
-        }}
-        variant="permanent"
-        anchor="left"
-      >
-        <List>
-          {['Dashboard', 'Usuarios registrados', 'Productos', 'Órdenes', 'Productos más vendidos', 'Series'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List>
-      </Drawer>
       <Container component="main" sx={{ flexGrow: 1, p: 3 }}>
         <Typography variant="h6" gutterBottom>
-          Detalles de Orden Nro {detallesOrden.id}
+          Detalles de Orden Nro {id}
         </Typography>
         <Paper sx={{ p: 2, mb: 2 }}>
           <Typography variant="body1" gutterBottom>
@@ -64,17 +61,13 @@ const DetalleOrden = () => {
             <Grid item xs={6}>
               <Typography variant="body2">
                 <strong>Dirección de Envío</strong><br />
-                {detallesOrden.direccionEnvio.direccion}<br />
-                {detallesOrden.direccionEnvio.distrito}<br />
-                {detallesOrden.direccionEnvio.ciudad}<br />
-                {detallesOrden.direccionEnvio.pais}
+                {direccion.join(', ')}
               </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body2">
                 <strong>Pago</strong><br />
-                Pago con {detallesOrden.metodoPago.metodo}<br />
-                Tarjeta de Crédito que termina en: {detallesOrden.metodoPago.tarjeta}
+                {isCreditCard ? `Pago con tarjeta de crédito que termina en: ****${metodoPago.slice(-4)}` : 'Pago con código QR'}
               </Typography>
             </Grid>
           </Grid>
@@ -83,9 +76,9 @@ const DetalleOrden = () => {
           <Typography variant="body1" gutterBottom>
             <strong>Método de Envío</strong>
           </Typography>
-          <RadioGroup value={detallesOrden.metodoEnvio}>
-            <FormControlLabel value="Económico Aéreo - S/10.00" control={<Radio />} label="Económico Aéreo - S/10.00" disabled />
-            <FormControlLabel value="Envío prioritario (5 a 10 días) - S/17.00" control={<Radio />} label="Envío prioritario (5 a 10 días) - S/17.00" disabled />
+          <RadioGroup value={metodoEnvio}>
+            <FormControlLabel value="economico" control={<Radio />} label="Económico Aéreo - S/10.00" disabled />
+            <FormControlLabel value="prioritario" control={<Radio />} label="Envío prioritario (5 a 10 días) - S/17.00" disabled />
           </RadioGroup>
         </Paper>
         <Paper sx={{ p: 2, mb: 2 }}>
@@ -94,9 +87,9 @@ const DetalleOrden = () => {
               <Typography variant="body1" gutterBottom>
                 <strong>Items en Pedido:</strong>
               </Typography>
-              {detallesOrden.items.map((item, index) => (
+              {OrderProducts.map((item, index) => (
                 <Typography key={index} variant="body2">
-                  1x {item.nombre} - {item.precio}
+                  {item.cantidad}x {item.Producto.nombre} - S/ {item.Producto.precio}
                 </Typography>
               ))}
             </Grid>
@@ -104,11 +97,11 @@ const DetalleOrden = () => {
               <Typography variant="body1" gutterBottom>
                 <strong>Resumen de Orden:</strong>
               </Typography>
-              <Typography variant="body2">Subtotal: {detallesOrden.resumen.subtotal}</Typography>
-              <Typography variant="body2">Envío: {detallesOrden.resumen.envio}</Typography>
-              <Typography variant="body2">Impuestos: {detallesOrden.resumen.impuestos}</Typography>
-              <Typography variant="body2"><strong>Total: {detallesOrden.resumen.total}</strong></Typography>
-              <Button variant="contained" color="secondary" sx={{ mt: 2 }}>Cancelar Pedido</Button>
+              <Typography variant="body2">Subtotal: S/ {total - (metodoEnvio === 'economico' ? 10 : 17) - (total * 0.18).toFixed(2)}</Typography>
+              <Typography variant="body2">Envío: S/ {metodoEnvio === 'economico' ? '10.00' : '17.00'}</Typography>
+              <Typography variant="body2">Impuestos: S/ {(total * 0.18).toFixed(2)}</Typography>
+              <Typography variant="body2"><strong>Total: S/ {total.toFixed(2)}</strong></Typography>
+              <Button variant="contained" color="secondary" sx={{ mt: 2 }} onClick={handleCancelarOrden}>Cancelar Pedido</Button>
             </Grid>
           </Grid>
         </Paper>
@@ -117,4 +110,4 @@ const DetalleOrden = () => {
   );
 };
 
-export default DetalleOrden;
+export default DetalleOrdenAdmin;

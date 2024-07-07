@@ -1,4 +1,3 @@
-// ListaOrdenes.jsx
 import React, { useEffect, useState } from 'react';
 import { Box, Button, Container, CssBaseline, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, TextField, Pagination } from '@mui/material';
 import BarraLateral2 from '../../Componentes/BarraLateral2';
@@ -9,29 +8,28 @@ import { useNavigate } from 'react-router-dom';
 
 const drawerWidth = 240;
 
-const ListaOrdenes = () => {
+const ListaOrdenesAdmin = () => {
   const [pagina, setPagina] = useState(1);
-  const [filasPorPagina, setFilasPorPagina] = useState(5); 
-
+  const [filasPorPagina, setFilasPorPagina] = useState(5);
   const [data, setData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
 
   const navigate = useNavigate();
 
-  async function obtenerOrdenes(query=""){
-    const url_base = "http://localhost:3100/ordenes";
-    const url = query ? `${url_base}-url?id=${query}&usuarioId=${query}` : url_base; 
+  async function obtenerOrdenes(query = "") {
+    const url_base = `http://localhost:3100/ordenes${query ? `/${query}` : ''}`;
     try {
-      const res = await fetch(url);
+      const res = await fetch(url_base);
       if (res.status === 200) {
-          const data = await res.json();
-          setData(data);
+        const data = await res.json();
+        setData(Array.isArray(data) ? data : [data]); // Si es un arreglo, lo asigna directamente, si no, lo convierte en un arreglo de un solo elemento
       } else {
-          alert("La orden no existe");
+        alert("La orden no existe");
+        setData([]); // Limpiar los datos si no se encuentra la orden
       }
     } catch (error) {
       console.error('Error fetching data:', error);
-     }
+    }
   }
 
   useEffect(() => {
@@ -42,27 +40,6 @@ const ListaOrdenes = () => {
     obtenerOrdenes(searchQuery);
   };
 
-  // Función para desactivar una orden
-  const handleDesactivarOrden = async (ordenId) => {
-    try {
-      const response = await fetch(`http://localhost:3100/ordenes/${ordenId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      if (response.status === 200) {
-        alert("Esta orden ha sido desactivada");
-        obtenerOrdenes(); // Actualizar la lista de órdenes después de desactivar
-      } else {
-        alert("Error al desactivar la orden");
-      }
-    } catch (error) {
-      console.error("Error al desactivar la orden:", error);
-    }
-  };
-
-  // Función para cambiar de página
   const handleChangePagina = (event, nuevaPagina) => {
     setPagina(nuevaPagina);
   };
@@ -86,7 +63,7 @@ const ListaOrdenes = () => {
             fullWidth
             margin="normal"
             variant="outlined"
-            placeholder="Buscar por nombre de usuario o ID de orden..."
+            placeholder="Buscar por ID de orden..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             InputProps={{
@@ -119,7 +96,7 @@ const ListaOrdenes = () => {
                 <TableBody>
                   {data.length > 0 ? (
                     data.map((orden, index) => (
-                      <RellenarOrden key={index} orden={orden} onOrdenDesactivada={handleDesactivarOrden} />
+                      <RellenarOrden key={index} orden={orden} />
                     ))
                   ) : (
                     <TableRow>
@@ -148,4 +125,4 @@ const ListaOrdenes = () => {
   );
 };
 
-export default ListaOrdenes;
+export default ListaOrdenesAdmin;

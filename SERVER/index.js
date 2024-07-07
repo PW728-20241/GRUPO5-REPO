@@ -400,6 +400,9 @@ app.put("/usuarios/cambioEstado/:id", async function(req, res) {
 app.get("/usuarios/detalle/:id", async (req, res) => {
     const { id } = req.params;
     try {
+        if (!id) {
+            return res.status(400).send("ID de usuario no proporcionado");
+        }
         const usuario = await Usuario.findByPk(id, {
             attributes: [
                 'id',
@@ -411,14 +414,13 @@ app.get("/usuarios/detalle/:id", async (req, res) => {
         if (usuario) {
             res.json(usuario);
         } else {
-            res.status(404).send("Usuario no encontrado");
+            res.status(400).send("Usuario no encontrado");
         }
     } catch (error) {
         console.error("Error al obtener los detalles del usuario:", error);
         res.status(500).send("Error interno del servidor");
     }
 });
-
 
 /** NOS MUESTRA TODA LA LISTA DE ORDENES USANDO UN ATRIBUTO DE LA TABLA DE USUARIOS*/
 app.get("/ordenes", async (req, res) => {
@@ -456,25 +458,35 @@ app.get('/ordenes', async function(req,res){
         res.json(ordenes);
 });
 */
-/**SIRVE PARA BUSCAR UNA ORDEN DE ACUERDO A CIERTOS PARAMETROS **/
-app.get('/ordenes-url', async function(req,res){
-    const {id, usuario} = req.query;
-    try{
-        const orden = await Orden.findAll({
-            where: {
-                id: id,
-                usuario: usuario
-            }
+/**SIRVE PARA BUSCAR UNA ORDEN DE ACUERDO A ID **/
+app.get('/ordenes/:id', async function(req, res) {
+    const { id } = req.params;
+    try {
+        const orden = await Orden.findByPk(id, {
+            attributes: [
+                'id',
+                [sequelize.literal(`"Usuario"."nombre" || ' ' || "Usuario"."apellido"`), 'nombreUsuario'],
+                'fechaOrden',
+                'total',
+                [sequelize.col('Usuario.correo'), 'correoUsuario'],
+                'estado'
+            ],
+            include: [
+                {
+                    model: Usuario,
+                    attributes: []
+                }
+            ]
         });
         if (orden) {
             res.json(orden);
         } else {
-            res.status(404).send("Orden no econtrada");
+            res.status(404).send("Orden no encontrada");
         }
     } catch (error) {
-        res.status(404).send(error, "Error al obtener la orden");
+        console.error("Error al obtener la orden:", error);
+        res.status(500).send("Error interno del servidor");
     }
-    
 });
 
 
