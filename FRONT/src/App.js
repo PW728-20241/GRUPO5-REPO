@@ -23,14 +23,15 @@ import RecuperarPassword from './Paginas/Alumno03/RecuperarPassword';
 import ListadoSeries from './Paginas/Alumno04/LSA';
 
 import DashboardUsuario from './Paginas/Alumno03/DashboardUsuario';
+import { AuthProvider } from './Componentes/AuthContext';
 
-import ProtectedRoute from './Componentes/protectedroute';
 import AcercaDeNosotros from './Componentes/AcercadeNosotros';
 import PoliticaDeEnvio from './Componentes/Politicaenvio';
 import FAQ from './Componentes/FAQ';
 import Ayuda from './Componentes/ayuda';
 function App (){
   return (
+    <AuthProvider>
      <Router>
           <Routes>
               <Route path='' element={<PaginaPrincipal/>}/>
@@ -56,9 +57,7 @@ function App (){
               <Route 
               path='/checkout' 
               element={
-              <ProtectedRoute>
               <CheckoutPage/>
-              </ProtectedRoute>
               }
               />
               <Route path='/registrar'element={<Registrar/>}/>
@@ -74,6 +73,7 @@ function App (){
               <Route path='/ayuda' element={<Ayuda/>}/>
           </Routes>
      </Router>
+     </AuthProvider>
   );
 
 }

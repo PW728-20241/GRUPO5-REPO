@@ -539,10 +539,16 @@ app.post('/recuperarPassword', async (req, res) => {
 /*
 ENDPOINTS PARA ORDENES
 */
+app.use(express.json());
+
 app.post('/orden', async (req, res) => {
-    const { shippingAddress, paymentMethod, creditCard, cartItems, total, shippingMethod } = req.body;
+    const { shippingAddress, paymentMethod, creditCard, cartItems, total, shippingMethod, userId } = req.body;
 
     try {
+        if (!userId) {
+            return res.status(400).json({ message: 'User ID is required' });
+        }
+
         let metodoPago;
         if (paymentMethod === 'tarjeta') {
             metodoPago = creditCard.numeroTarjeta;
@@ -551,6 +557,7 @@ app.post('/orden', async (req, res) => {
         }
 
         const nuevaOrden = await Orden.create({
+            usuarioId: userId, // Asegúrate de incluir el usuarioId aquí
             fechaOrden: new Date(),
             total,
             estado: 'pendiente',
@@ -579,6 +586,9 @@ app.post('/orden', async (req, res) => {
         res.status(500).json({ message: 'Error al crear la orden' });
     }
 });
+
+
+
 // Crear una nueva orden
 
 // Obtener una orden por ID

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Box, Typography, TextField, Button, Radio, RadioGroup, FormControlLabel, FormControl } from '@mui/material';
-import { useNavigate } from 'react-router-dom'; // Importa useNavigate
+import { useNavigate } from 'react-router-dom';
 import Header1 from '../../Componentes/Header1';
 import Footer from '../../Componentes/Footer';
 
 const CheckoutPage = () => {
-  const navigate = useNavigate(); // Usa useNavigate para la navegación
+  const navigate = useNavigate();
 
   const [shippingAddress, setShippingAddress] = useState({
     linea1: '',
@@ -26,10 +26,21 @@ const CheckoutPage = () => {
   const [shippingMethod, setShippingMethod] = useState('economico');
   const [cartItems, setCartItems] = useState([]);
   const [total, setTotal] = useState(0);
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     const storedCartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
     setCartItems(storedCartItems);
+
+    const user = localStorage.getItem('user');
+    if (user) {
+      try {
+        const userData = JSON.parse(user);
+        setUserId(userData.id);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+      }
+    }
 
     const subtotal = storedCartItems.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
     const shippingCost = shippingMethod === 'economico' ? 10 : 17;
@@ -71,14 +82,13 @@ const CheckoutPage = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ shippingAddress, paymentMethod, creditCard, cartItems, total, shippingMethod })
+        body: JSON.stringify({ shippingAddress, paymentMethod, creditCard, cartItems, total, shippingMethod, userId })
       });
 
       if (response.ok) {
         const result = await response.json();
         localStorage.removeItem('cartItems');
         setCartItems([]);
-        // Redirige a DetalleOrden con los detalles de la orden
         navigate('/', { state: { orderDetails: { ...result, shippingAddress, paymentMethod, creditCard, cartItems, total, shippingMethod } } });
       } else {
         alert('Error al completar la orden');

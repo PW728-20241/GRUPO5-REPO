@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -9,6 +9,7 @@ import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Slide from '@mui/material/Slide';
 import Grow from '@mui/material/Grow';
+import { AuthContext } from './AuthContext'; // Importa el AuthContext
 
 const Barra = styled('div')(({ theme }) => ({
   flexGrow: 1,
@@ -39,8 +40,9 @@ const Navegar = styled(Button)(({ theme }) => ({
   },
 }));
 
-const Header1 = ({ isAuthenticated, handleLogout }) => {
+const Header1 = () => {
   const navigate = useNavigate();
+  const { user, logout } = useContext(AuthContext); // Usa el contexto de autenticación
 
   const handleNavigate = (path, section) => {
     navigate(path);
@@ -77,15 +79,15 @@ const Header1 = ({ isAuthenticated, handleLogout }) => {
               </Navegar>
             </Grow>
             <Box sx={{ flexGrow: 1 }} />
-            <IconButton href="/carritocompra" color="inherit">
+            <IconButton onClick={() => handleNavigate('/carritocompra')} color="inherit">
               <ShoppingCartIcon />
             </IconButton>
             <Grow in={true} timeout={1300}>
-              <Navegar href='/ayuda'>
+              <Navegar onClick={() => handleNavigate('/ayuda')}>
                 Ayuda
               </Navegar>
             </Grow>
-            {isAuthenticated ? (
+            {user ? (
               <>
                 <Grow in={true} timeout={1500}>
                   <Button
@@ -100,7 +102,7 @@ const Header1 = ({ isAuthenticated, handleLogout }) => {
                   <Button
                     variant="contained"
                     sx={{ marginLeft: 2, backgroundColor: '#fbbd08', color: '#ffffff' }}
-                    onClick={handleLogout}
+                    onClick={logout}
                   >
                     Cerrar Sesión
                   </Button>
@@ -111,7 +113,7 @@ const Header1 = ({ isAuthenticated, handleLogout }) => {
                 <Button
                   variant="contained"
                   sx={{ marginLeft: 2, backgroundColor: '#fbbd08', color: '#ffffff' }}
-                  onClick={() => navigate('/iniciar-sesion')}
+                  onClick={() => navigate('/iniciarsesion')}
                 >
                   Mi Cuenta
                 </Button>
