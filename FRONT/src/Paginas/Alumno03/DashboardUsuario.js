@@ -12,14 +12,14 @@ const ListaOrdenesusuario = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
-  async function obtenerOrdenes() {
+  async function obtenerOrdenes(query = "") {
     const user = JSON.parse(localStorage.getItem('user'));
     const usuarioId = user ? user.id : null;
     if (!usuarioId) {
       alert('No estás logueado');
       return;
     }
-    const url_base = `http://localhost:3100/ordenes?usuarioId=${usuarioId}`;
+    const url_base = query ? `http://localhost:3100/busquedaordensenusuarios?usuarioId=${usuarioId}&id=${query}` : `http://localhost:3100/busquedaordensenusuarios?usuarioId=${usuarioId}`;
     try {
       const res = await fetch(url_base);
       if (res.status === 200) {

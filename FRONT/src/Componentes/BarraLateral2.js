@@ -32,10 +32,6 @@ const Sidebar = () => {
           <ListItemText primary="Ordenes" sx={{ textAlign: 'center' }} />
         </ListItem>
 
-        <ListItem button sx={{ p: 1 }} onClick={() => handleNavigation('/')}>
-          <ListItemText primary="Productos más vendidos" sx={{ textAlign: 'center' }} />
-        </ListItem>
-
         <ListItem button sx={{ p: 1 }} onClick={() => handleNavigation('/ListaSeries')}>
           <ListItemText primary="Series" sx={{ textAlign: 'center' }} />
         </ListItem>

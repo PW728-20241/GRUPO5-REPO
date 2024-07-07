@@ -99,14 +99,23 @@ app.put("/producto/:id", async function (req, res) {
     res.status(400).send("No se encuentra el producto");
   }
 });
+  
 
-/*app.get('/buscar', function(req, res) {
-    const query = req.query.query.toLowerCase();
-    const resultados = productos.filter(producto => 
-        producto.nombre.toLowerCase().includes(query)
-    );
-    res.json(resultados);
-});*/
+app.get('/busquedaordensenusuarios', async (req, res) => {
+    const { usuarioId, id } = req.query;
+    try {
+      let ordenes;
+      if (id) {
+        ordenes = await Orden.findAll({ where: { id, usuarioId } });
+      } else {
+        ordenes = await Orden.findAll({ where: { usuarioId } });
+      }
+      res.json(ordenes);
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+      res.status(500).json({ error: 'Failed to fetch orders' });
+    }
+  });
 
 app.get("/buscar", async function (req, res) {
   const query = req.query.query.toLowerCase();
