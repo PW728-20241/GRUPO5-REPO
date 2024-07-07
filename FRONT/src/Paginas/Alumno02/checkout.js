@@ -27,6 +27,7 @@ const CheckoutPage = () => {
   const [cartItems, setCartItems] = useState([]);
   const [total, setTotal] = useState(0);
   const [userId, setUserId] = useState(null);
+  const [qrUrl, setQrUrl] = useState(null);
 
   useEffect(() => {
     const storedCartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
@@ -55,6 +56,11 @@ const CheckoutPage = () => {
 
   const handlePaymentChange = (e) => {
     setPaymentMethod(e.target.value);
+    if (e.target.value === 'qr') {
+      generateQr();
+    } else {
+      setQrUrl(null);
+    }
   };
 
   const handleCreditCardChange = (e) => {
@@ -64,6 +70,28 @@ const CheckoutPage = () => {
 
   const handleShippingMethodChange = (e) => {
     setShippingMethod(e.target.value);
+  };
+
+  const generateQr = async () => {
+    try {
+      const response = await fetch('http://localhost:3100/generate-qr', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ orderId: `order_${Date.now()}` })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setQrUrl(data.qrUrl);
+      } else {
+        alert('Error al generar el código QR');
+      }
+    } catch (error) {
+      console.error('Error al generar el código QR:', error);
+      alert('Error al generar el código QR');
+    }
   };
 
   const handleSubmit = async () => {
@@ -97,7 +125,7 @@ const CheckoutPage = () => {
         const result = await response.json();
         localStorage.removeItem('cartItems');
         setCartItems([]);
-        navigate('/', { state: { orderDetails: { ...result, shippingAddress, paymentMethod, creditCard, cartItems, total, shippingMethod } } });
+        navigate('/graciascompra', { state: { orderDetails: { ...result, shippingAddress, paymentMethod, creditCard, cartItems, total, shippingMethod } } });
       } else {
         alert('Error al completar la orden');
       }
@@ -140,9 +168,9 @@ const CheckoutPage = () => {
                 <TextField label="CCV" name="ccv" value={creditCard.ccv} onChange={handleCreditCardChange} fullWidth margin="normal" />
               </Box>
             )}
-            {paymentMethod === 'qr' && (
+            {paymentMethod === 'qr' && qrUrl && (
               <Box sx={{ mt: 2 }}>
-                <img src="https://via.placeholder.com/150" alt="QR Code" />
+                <img src={qrUrl} alt="QR Code" />
               </Box>
             )}
           </Box>

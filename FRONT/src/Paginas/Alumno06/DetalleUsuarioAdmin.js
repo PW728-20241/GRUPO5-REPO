@@ -92,11 +92,11 @@ function DetalleUsuarioAdmin() {
                                     {ordenes.length > 0 ? ordenes.map((orden, index) => (
                                         <TableRow key={index}>
                                             <TableCell>{orden.id}</TableCell>
-                                            <TableCell>{orden.fechaOrden}</TableCell>
+                                            <TableCell>{new Date(orden.fechaOrden).toLocaleDateString()}</TableCell>
                                             <TableCell>{orden.total}</TableCell>
                                             <TableCell>{orden.estado}</TableCell>
                                             <TableCell>
-                                                <Link href={`/detalleorden/${orden.id}`} underline="hover">
+                                                <Link href={`/ordenes/${orden.id}`} underline="hover">
                                                     Ver Detalle
                                                 </Link>
                                             </TableCell>

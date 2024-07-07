@@ -13,11 +13,11 @@ const ListaOrdenesAdmin = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
-  async function obtenerOrdenes(query=""){
-    const url_base = "http://localhost:3100/ordenes1";
-    const url = query ? `${url_base}-url?id=${query}&usuarioId=${query}` : url_base; 
+  async function obtenerOrdenes(query="") {
+    const url_base = `http://localhost:3100/busquedadeorden`;
+    const url = query ? `${url_base}?id=${query}` : url_base; 
     try {
-      const res = await fetch(url_base);
+      const res = await fetch(url);
       if (res.status === 200) {
         const data = await res.json();
         setData(Array.isArray(data) ? data : [data]);
@@ -41,7 +41,6 @@ const ListaOrdenesAdmin = () => {
     obtenerOrdenes(searchQuery);
   };
 
-  // Función para desactivar una orden
   const handleDesactivarOrden = async (ordenId) => {
     try {
       const response = await fetch(`http://localhost:3100/ordenes1/${ordenId}`, {
@@ -61,7 +60,6 @@ const ListaOrdenesAdmin = () => {
     }
   };
 
-  // Función para cambiar de página
   const handleChangePagina = (event, nuevaPagina) => {
     setPagina(nuevaPagina);
   };
@@ -114,7 +112,7 @@ const ListaOrdenesAdmin = () => {
                 </TableHead>
                 <TableBody>
                   {data.length > 0 ? (
-                    data.map((orden, index) => (
+                    data.slice((pagina - 1) * filasPorPagina, pagina * filasPorPagina).map((orden, index) => (
                       <RellenarOrden key={index} orden={orden} />
                     ))
                   ) : (

@@ -38,7 +38,7 @@ function RecommendedItems() {
                 component="img"
                 height="140"
                 image={item.imageUrl}
-                alt={item.name}
+                alt={item.nombre}
               />
               <CardContent>
                 <Typography gutterBottom variant="h6" component="div">

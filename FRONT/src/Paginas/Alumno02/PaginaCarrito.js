@@ -1,9 +1,8 @@
-// src/pages/CartPage.jsx
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Container, Button, FormControl, Select, MenuItem } from '@mui/material';
 import Header1 from '../../Componentes/Header1';
 import Footer from '../../Componentes/Footer';
-import {useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -67,7 +66,7 @@ const CartPage = () => {
               <Typography variant="h6" sx={{ mb: 2, borderBottom: '2px solid #ccc', paddingBottom: 1, background: "#D3D3D3", border: 2 }}>Items Disponibles para Envío</Typography>
               {cartItems.map(item => (
                 <Box key={item.id} sx={{ display: 'flex', alignItems: 'center', padding: 2, borderBottom: '1px solid #ddd' }}>
-                  <Box sx={{ width: 80, height: 80, backgroundColor: '#eee', mr: 2 }} />
+                  <img src={item.imageUrl} alt={item.nombre} style={{ width: 80, height: 80, objectFit: 'cover', marginRight: 16 }} />
                   <Box sx={{ flexGrow: 1 }}>
                     <Typography>{item.nombre}</Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -104,7 +103,7 @@ const CartPage = () => {
             <Typography variant="h6" sx={{ mb: 2, borderBottom: '2px solid #ccc', paddingBottom: 1, background: "#D3D3D3", border: 2 }}>Guardado para después</Typography>
             {savedItems.map(item => (
               <Box key={item.id} sx={{ display: 'flex', alignItems: 'center', padding: 2, borderBottom: '1px solid #ddd' }}>
-                <Box sx={{ width: 80, height: 80, backgroundColor: '#eee', mr: 2 }} />
+                <img src={item.imageUrl} alt={item.nombre} style={{ width: 80, height: 80, objectFit: 'cover', marginRight: 16 }} />
                 <Box sx={{ flexGrow: 1 }}>
                   <Typography>{item.nombre}</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>

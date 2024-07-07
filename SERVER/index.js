@@ -1,10 +1,9 @@
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import { faker } from "@faker-js/faker";
 
 import { sequelize } from "./database/database.js";
-
+import QRCode from 'qrcode';
 import { Sequelize, Op } from "sequelize";
 import {
   Usuario,
@@ -40,61 +39,18 @@ async function verificacionConexion() {
   }
 }
 
-/*
------------------------------------------------------
-...................ALUMNO 1..........................
------------------------------------------------------
-*/
-
-/*function crearProducto(id, nombre, precio, editor, fechaRegistro, stock, imageUrl, categoria, nuevo) {
-    return {
-        id: id,
-        nombre: nombre,
-        editor: editor,
-        precio: precio,
-        fechaRegistro: fechaRegistro,
-        stock: stock,
-        estado: "Activo",
-        imageUrl: imageUrl,
-        categoria: categoria,
-        nuevo: nuevo,
-        descripcion: faker.commerce.productDescription(),
-        caracteristicas: Array.from({ length: 5 }, () => faker.commerce.productMaterial())
-    };
-}*/
-
-/*const productos = [
-    crearProducto(1, "Assassin's Creed II", 60.00, "Ubisoft", "2024-06-25", 10, "/images/ezio.jpeg", "Aventura", false),
-    crearProducto(2, "FIFA 2022", 49.99, "EA Sports", "2024-06-25", 15, "/images/FIFA_22.webp", "Deportes", false),
-    crearProducto(3, "God of War", 59.99, "Sony", "2024-06-25", 5, "/images/god.avif", "Acción", false),
-    crearProducto(4, "Grand Theft Auto V", 39.99, "Rockstar", "2024-06-25", 20, "/images/Grand_Theft_Auto_V.png", "Aventura", false),
-    crearProducto(5, "Mortal Kombat I", 54.99, "NetherRealm", "2024-06-25", 12, "/images/mortal.avif", "Lucha", false),
-    crearProducto(6, "Minecraft", 29.99, "Mojang", "2024-06-25", 30, "/images/mine.webp", "Aventura", false),
-    crearProducto(7, "Horizon Zero Dawn", 49.99, "Guerrilla", "2024-06-25", 8, "/images/hori.webp", "Aventura", false),
-    crearProducto(8, "PUBG", 19.99, "PUBG Corp", "2024-06-25", 25, "/images/pub.png", "Disparos", false),
-    crearProducto(9, "The Last Of Us Part II", 59.99, "Naughty Dog", "2024-06-25", 18, "/images/last.webp", "Aventura", false),
-    crearProducto(10, "The Last Of Us", 39.99, "Naughty Dog", "2024-06-25", 14, "/images/lastofus.avif", "Aventura", false),
-    crearProducto(11, "Red Dead Redemption 2", 59.99, "Rockstar", "2024-06-25", 22, "/images/red.avif", "Aventura", false),
-    crearProducto(12, "Super Mario Maker", 49.99, "Nintendo", "2024-06-25", 7, "/images/Super_Mario_Maker_Artwork.jpg", "Plataformas", false),
-    crearProducto(13, "God of War PO", 69.99, "Sony", "2024-06-25", 9, "/images/ragna.webp", "Acción", false),
-    crearProducto(14, "Uncharted", 39.99, "Naughty Dog", "2024-06-25", 16, "/images/uncharted.jpg", "Aventura", false),
-    crearProducto(15, "WWE 2020", 49.99, "2K", "2024-06-25", 11, "/images/WWE_2K2.jpg", "Deportes", false),
-
-
-    crearProducto(16, "Magic The Gathering: Colección de Invierno Fase 2 2024 Nueva Temporada", 99.99, "Wizards of the Coast", "2024-06-25", 3, "/images/WWE_2K2.jpg", "Various", true),
-    crearProducto(17, "GI Joe Classified Series Big Boa, Airborne & More", 79.99, "Hasbro", "2024-06-25", 6, "/images/ufc.jpg", "Various", true),
-    crearProducto(18, "Spawn 30 Anniversary", 89.99, "McFarlane Toys", "2024-06-25", 4, "/images/injustice.jpg", "Various", true),
-
-
-    crearProducto(19, "Colección de Items 1: Juegos para regresar al colegio", 29.99, "Various", "2024-06-25", 27, "/images/casa.jpeg", "Colección", false),
-    crearProducto(20, "Colección de Items 2: Juegos para la casa", 19.99, "Various", "2024-06-25", 35, "/images/colegio.jpeg", "Colección", false),
-    crearProducto(21, "Colección de Items 3: Juegos para los pequeños", 24.99, "Various", "2024-06-25", 42, "/images/niños.webp", "Colección", false)
-];*/
-
-/*app.get('/contenido', function(req, res){
-    res.json(productos);
-});*/
-
+app.post('/generate-qr', (req, res) => {
+    const { orderId } = req.body;
+    const qrData = `Order ID: ${orderId}`;
+    QRCode.toDataURL(qrData, (err, url) => {
+      if (err) {
+        console.error('Error generating QR code:', err);
+        res.status(500).json({ error: 'Failed to generate QR code' });
+      } else {
+        res.status(200).json({ qrUrl: url });
+      }
+    });
+  });
 app.get("/productos", async function (req, res) {
   const listaProducto = await Producto.findAll();
   res.json(listaProducto);
@@ -295,16 +251,22 @@ app.get("/orden/fechaOrden/:fechaOrden", async function (req, res) {
     res.status(500).json({ error: "Error interno del servidor" });
   }
 });
-app.get("/productos5", function (req, res) {
-  res.json(arreglo_general);
-});
 
-app.get("/productos/random", function (req, res) {
-  const randomItems = arreglo_general
-    .sort(() => 0.5 - Math.random())
-    .slice(0, 5);
-  res.json(randomItems);
-});
+app.get("/productos/random", async (req, res) => {
+    try {
+      const productos = await Producto.findAll();
+      const randomItems = productos.sort(() => 0.5 - Math.random()).slice(0, 5);
+      const productosConUrlCompleta = randomItems.map(producto => ({
+        ...producto.toJSON(),
+        imageUrl: `http://localhost:3100${producto.imageUrl}`
+      }));
+      res.json(productosConUrlCompleta);
+    } catch (error) {
+      console.error("Error fetching random products:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+  
 
 app.post("/productos", async (req, res) => {
   const {
@@ -443,36 +405,50 @@ app.put("/usuarios/cambioEstado/:id", async function (req, res) {
     res.status(500).send("Ocurrió un error al cambiar el estado del usuario");
   }
 });
-
-/**ENDPOINT QUE ME VA A PERMITIR MOSTRAR EL DETALLE DEL USUARIO AL CLICKEAR VER */
-app.get("/usuarios/detalle/:id", async (req, res) => {
-  const { id } = req.params;
+app.get('/busquedadeorden', async (req, res) => {
+  const { id } = req.query;
   try {
-    const usuario = await Usuario.findByPk(id, {
-      attributes: [
-        "id",
-        [
-          sequelize.fn(
-            "concat",
-            sequelize.col("nombre"),
-            " ",
-            sequelize.col("apellido")
-          ),
-          "nombreCompleto",
-        ],
-        "correo",
-        "fechaRegistro",
-      ],
-    });
-    if (usuario) {
-      res.json(usuario);
+    if (id) {
+      const orden = await Orden.findOne({ where: { id } });
+      if (orden) {
+        res.json(orden);
+      } else {
+        res.status(404).json({ error: 'Orden no encontrada' });
+      }
     } else {
-      res.status(404).send("Usuario no encontrado");
+      const ordenes = await Orden.findAll();
+      res.json(ordenes);
     }
   } catch (error) {
-    console.error("Error al obtener los detalles del usuario:", error);
-    res.status(500).send("Error interno del servidor");
+    console.error('Error fetching orders:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
+});
+/**ENDPOINT QUE ME VA A PERMITIR MOSTRAR EL DETALLE DEL USUARIO AL CLICKEAR VER */
+app.get('/usuarios/detalle/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const usuario = await Usuario.findByPk(id);
+        if (usuario) {
+            res.json(usuario);
+        } else {
+            res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+app.get('/usuario/:id/ordenes', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const ordenes = await Orden.findAll({
+            where: { usuarioId: id },
+            limit: 10 // Limita el número de órdenes a 10
+        });
+        res.json(ordenes);
+    } catch (error) {
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
 });
 
 /** NOS MUESTRA TODA LA LISTA DE ORDENES USANDO UN ATRIBUTO DE LA TABLA DE USUARIOS*/
