@@ -16,26 +16,26 @@ const Barra = styled('div')(({ theme }) => ({
 }));
 
 const Titulo_Boton = styled(Button)(({ theme }) => ({
-  color: '#000000', 
+  color: '#000000',
   textTransform: 'none',
   fontWeight: 'bold',
   fontSize: '1.25rem',
-  fontFamily: 'Arial, sans-serif', 
+  fontFamily: 'Arial, sans-serif',
   transition: 'color 0.3s ease, transform 0.2s ease',
   '&:hover': {
-    color: '#fbbd08', 
+    color: '#fbbd08',
     transform: 'scale(1.1)',
   },
 }));
 
 const Navegar = styled(Button)(({ theme }) => ({
-  color: '#000000', 
+  color: '#000000',
   textTransform: 'none',
   marginLeft: theme.spacing(2),
-  fontFamily: 'Arial, sans-serif', 
+  fontFamily: 'Arial, sans-serif',
   transition: 'color 0.3s ease, transform 0.2s ease',
   '&:hover': {
-    color: '#fbbd08', 
+    color: '#fbbd08',
     transform: 'scale(1.1)',
   },
 }));
@@ -54,10 +54,10 @@ const Header1 = () => {
   };
 
   const handleAccountClick = () => {
-    if (user.correo === 'admin@ejemplo.com' && user.password === 'admin') {
+    if (user.correo === 'admin@ejemplo.com') {
       navigate('/Dashboard');
     } else {
-      navigate('/Listaordenesusuario');
+      navigate('/ListaOrdenesUsuario');
     }
   };
 

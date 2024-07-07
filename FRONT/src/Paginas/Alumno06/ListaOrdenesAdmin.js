@@ -1,4 +1,3 @@
-// ListaOrdenes.jsx
 import React, { useEffect, useState } from 'react';
 import { Box, Button, Container, CssBaseline, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, TextField, Pagination } from '@mui/material';
 import BarraLateral2 from '../../Componentes/BarraLateral2';
@@ -7,31 +6,31 @@ import Footer from '../../Componentes/Footer';
 import RellenarOrden from './ContenidoTablaOrdenes';
 import { useNavigate } from 'react-router-dom';
 
-const drawerWidth = 240;
-
-const ListaOrdenes = () => {
+const ListaOrdenesAdmin = () => {
   const [pagina, setPagina] = useState(1);
-  const [filasPorPagina, setFilasPorPagina] = useState(5); 
-
+  const [filasPorPagina, setFilasPorPagina] = useState(5);
   const [data, setData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-
   const navigate = useNavigate();
 
   async function obtenerOrdenes(query=""){
     const url_base = "http://localhost:3100/ordenes1";
     const url = query ? `${url_base}-url?id=${query}&usuarioId=${query}` : url_base; 
     try {
-      const res = await fetch(url);
+      const res = await fetch(url_base);
       if (res.status === 200) {
-          const data = await res.json();
-          setData(data);
+        const data = await res.json();
+        setData(Array.isArray(data) ? data : [data]);
+      } else if (res.status === 404) {
+        alert("Orden no encontrada");
+        setData([]);
       } else {
-          alert("La orden no existe");
+        alert("Error al buscar la orden");
+        setData([]);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
-     }
+    }
   }
 
   useEffect(() => {
@@ -78,15 +77,12 @@ const ListaOrdenes = () => {
             <Typography variant="h4" style={{ fontWeight: 'bold' }} gutterBottom>
               Lista de Órdenes
             </Typography>
-            <Button variant="contained" style={{ backgroundColor: '#FFEB3B', color: 'black', fontWeight: 'bold' }}>
-              Agregar Orden
-            </Button>
           </Box>
           <TextField
             fullWidth
             margin="normal"
             variant="outlined"
-            placeholder="Buscar por nombre de usuario o ID de orden..."
+            placeholder="Buscar por ID de orden..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             InputProps={{
@@ -119,7 +115,7 @@ const ListaOrdenes = () => {
                 <TableBody>
                   {data.length > 0 ? (
                     data.map((orden, index) => (
-                      <RellenarOrden key={index} orden={orden} onOrdenDesactivada={handleDesactivarOrden} />
+                      <RellenarOrden key={index} orden={orden} />
                     ))
                   ) : (
                     <TableRow>
@@ -148,4 +144,4 @@ const ListaOrdenes = () => {
   );
 };
 
-export default ListaOrdenes;
+export default ListaOrdenesAdmin;

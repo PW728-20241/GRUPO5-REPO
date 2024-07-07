@@ -43,7 +43,7 @@ const ListaOrdenesusuario = () => {
 
   const handleDesactivarOrden = async (ordenId) => {
     try {
-      const response = await fetch(`http://localhost:3100/ordenes/${ordenId}`, {
+      const response = await fetch(`http://localhost:3100/ordenes1/${ordenId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -62,6 +62,10 @@ const ListaOrdenesusuario = () => {
 
   const handleChangePagina = (event, nuevaPagina) => {
     setPagina(nuevaPagina);
+  };
+
+  const handleVerDetalle = (ordenId) => {
+    navigate(`/ordenes/${ordenId}`);
   };
 
   return (
@@ -119,8 +123,11 @@ const ListaOrdenesusuario = () => {
                       <TableCell style={{ textAlign: 'center' }}>{orden.total}</TableCell>
                       <TableCell style={{ textAlign: 'center' }}>{orden.estado}</TableCell>
                       <TableCell style={{ textAlign: 'center' }}>
+                        <Button variant="contained" color="primary" onClick={() => handleVerDetalle(orden.id)}>
+                          Ver
+                        </Button>
                         <Button variant="contained" color="secondary" onClick={() => handleDesactivarOrden(orden.id)}>
-                          Desactivar
+                          Cancelar
                         </Button>
                       </TableCell>
                     </TableRow>

@@ -45,7 +45,7 @@ function App (){
               <Route path="/usuarios/:id" element={<DetalleUsuarioAdmin/>}/>
               <Route path='/ListaOrdenesAdmin' element={<ListaOrdenesAdmin/>}/> 
               <Route path='/DetalleUsuarioAdmin' element={<DetalleUsuarioAdmin/>}/> 
-              <Route path='/DetalleOrdenAdmin' element={<DetalleOrdenAdmin/>}/>
+              <Route path='/DetalleOrdenAdmin/:id' element={<DetalleOrdenAdmin/>}/>
               <Route path='/ListaSeries' element={<ListadoSeries/>}/>
               <Route path='/ver/serie/:id' element={<SeriesDetail/>}/>
               <Route path='/crear-serie' element={<CreateSerie/>}/>

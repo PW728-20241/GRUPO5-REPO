@@ -5,8 +5,6 @@ import BarraLateral2 from '../../Componentes/BarraLateral2';
 import Header2 from '../../Componentes/Header2';
 import Footer from '../../Componentes/Footer';
 
-const drawerWidth = 240;
-
 function DetalleUsuarioAdmin() {
     const { id } = useParams();
     const [usuario, setUsuario] = useState(null);
@@ -15,21 +13,33 @@ function DetalleUsuarioAdmin() {
     useEffect(() => {
         const fetchUsuario = async () => {
             try {
-                const res = await fetch(`http://localhost:3100/usuarios-url?id=${id}`);
-                const data = await res.json();
-                setUsuario(data[0]);
+                const res = await fetch(`http://localhost:3100/usuarios/detalle/${id}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setUsuario(data);
+                } else {
+                    console.error('Error fetching user:', res.status);
+                    setUsuario(null);
+                }
             } catch (error) {
                 console.error("Error fetching user:", error);
+                setUsuario(null);
             }
         };
 
         const fetchOrdenes = async () => {
             try {
-                const res = await fetch(`http://localhost:3100/ordenes-url?usuarioId=${id}`);
-                const data = await res.json();
-                setOrdenes(data);
+                const res = await fetch(`http://localhost:3100/usuario/${id}/ordenes`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setOrdenes(data);
+                } else {
+                    console.error('Error fetching orders:', res.status);
+                    setOrdenes([]);
+                }
             } catch (error) {
                 console.error("Error fetching orders:", error);
+                setOrdenes([]);
             }
         };
 
@@ -37,7 +47,7 @@ function DetalleUsuarioAdmin() {
             fetchUsuario();
             fetchOrdenes();
         }
-    }, [id]); 
+    }, [id]);
 
     return (
         <>
@@ -51,12 +61,14 @@ function DetalleUsuarioAdmin() {
                     </Typography>
                     {usuario ? (
                         <Paper sx={{ p: 2, mb: 2 }}>
-                            <Typography variant="body1">
-                                <strong>ID:</strong> {usuario.id} &nbsp;
-                                <strong>Nombre:</strong> {usuario.nombre} &nbsp;
-                                <strong>Correo:</strong> {usuario.correo} &nbsp;
-                                <strong>Fecha de Registro:</strong> {usuario.fechaRegistro}
-                            </Typography>
+                            <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
+                                <Typography variant="body1" sx={{ flex: '1 1 50%', pr: 2 }}>
+                                    <strong>ID:</strong> {usuario.id} <br />
+                                    <strong>Nombre:</strong> {usuario.nombreCompleto} <br />
+                                    <strong>Correo:</strong> {usuario.correo} <br />
+                                    <strong>Fecha de Registro:</strong> {usuario.fechaRegistro}
+                                </Typography>
+                            </Box>
                         </Paper>
                     ) : (
                         <Typography variant="body1">Cargando datos de usuario...</Typography>
@@ -72,7 +84,6 @@ function DetalleUsuarioAdmin() {
                                         <TableCell>ID</TableCell>
                                         <TableCell>Fecha de Orden</TableCell>
                                         <TableCell>Total</TableCell>
-                                        <TableCell>Productos</TableCell>
                                         <TableCell>Estado</TableCell>
                                         <TableCell>Acciones</TableCell>
                                     </TableRow>
@@ -83,17 +94,16 @@ function DetalleUsuarioAdmin() {
                                             <TableCell>{orden.id}</TableCell>
                                             <TableCell>{orden.fechaOrden}</TableCell>
                                             <TableCell>{orden.total}</TableCell>
-                                            <TableCell>{orden.productos}</TableCell>
                                             <TableCell>{orden.estado}</TableCell>
                                             <TableCell>
-                                                <Link href="#" underline="hover">
-                                                    Ver
+                                                <Link href={`/detalleorden/${orden.id}`} underline="hover">
+                                                    Ver Detalle
                                                 </Link>
                                             </TableCell>
                                         </TableRow>
                                     )) : (
                                         <TableRow>
-                                            <TableCell colSpan={6} style={{ textAlign: 'center' }}>
+                                            <TableCell colSpan={5} style={{ textAlign: 'center' }}>
                                                 No hay órdenes disponibles
                                             </TableCell>
                                         </TableRow>
