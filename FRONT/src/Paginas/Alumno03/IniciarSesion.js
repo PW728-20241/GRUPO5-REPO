@@ -3,14 +3,14 @@ import { Container, Box, TextField, Button, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../Componentes/Header1';
 import Footer from '../../Componentes/Footer';
-import { AuthContext } from '../../Componentes/AuthContext'; // Importa el AuthContext
+import { AuthContext } from '../../Componentes/AuthContext';
 
 const IniciarSesion = () => {
   const [correo, setCorreo] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext); // Usa el contexto de autenticación
+  const { login } = useContext(AuthContext);
 
   const manejarIniciarSesion = async (e) => {
     e.preventDefault();
@@ -26,7 +26,8 @@ const IniciarSesion = () => {
 
       if (response.ok) {
         const data = await response.json();
-        login({ ...data.user, token: data.token }); // Asegúrate de que el token esté incluido en los datos del usuario
+        localStorage.setItem('user', JSON.stringify(data.user));  // Guardar información del usuario
+        login(data.user);
         alert(data.message);
         navigate('/');
       } else {

@@ -82,7 +82,15 @@ const CheckoutPage = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ shippingAddress, paymentMethod, creditCard, cartItems, total, shippingMethod, userId })
+        body: JSON.stringify({ 
+          shippingAddress, 
+          paymentMethod, 
+          creditCard, 
+          cartItems, 
+          total, 
+          shippingMethod, 
+          userId
+        })
       });
 
       if (response.ok) {

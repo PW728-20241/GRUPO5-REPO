@@ -506,19 +506,34 @@ app.post('/registrar', async (req, res) => {
 
 app.post('/login', async (req, res) => {
     const { correo, password } = req.body;
-
+  
     try {
-        const usuario = await Usuario.findOne({ where: { correo, password } });
-        if (usuario) {
-            res.json({ message: 'Inicio de sesión exitoso', usuario });
-        } else {
-            res.status(401).json({ error: 'Correo o contraseña incorrectos' });
+      const usuario = await Usuario.findOne({ where: { correo } });
+  
+      if (!usuario) {
+        return res.status(404).json({ message: 'Usuario no encontrado' });
+      }
+  
+      if (password !== usuario.password) {
+        return res.status(401).json({ message: 'Contraseña incorrecta' });
+      }
+  
+      res.json({
+        message: 'Inicio de sesión exitoso',
+        user: {
+          id: usuario.id,
+          nombre: usuario.nombre,
+          apellido: usuario.apellido,
+          correo: usuario.correo
         }
+      });
     } catch (error) {
-        console.error('Error al iniciar sesión:', error);
-        res.status(500).json({ error: 'No se pudo iniciar sesión' });
+      console.error('Error en el inicio de sesión:', error);
+      res.status(500).json({ message: 'Error en el inicio de sesión' });
     }
-});
+  });
+  
+  
 app.post('/recuperarPassword', async (req, res) => {
     const { correo } = req.body;
 
@@ -543,50 +558,49 @@ app.use(express.json());
 
 app.post('/orden', async (req, res) => {
     const { shippingAddress, paymentMethod, creditCard, cartItems, total, shippingMethod, userId } = req.body;
-
-    try {
-        if (!userId) {
-            return res.status(400).json({ message: 'User ID is required' });
-        }
-
-        let metodoPago;
-        if (paymentMethod === 'tarjeta') {
-            metodoPago = creditCard.numeroTarjeta;
-        } else {
-            metodoPago = paymentMethod; // Esto será 'qr'
-        }
-
-        const nuevaOrden = await Orden.create({
-            usuarioId: userId, // Asegúrate de incluir el usuarioId aquí
-            fechaOrden: new Date(),
-            total,
-            estado: 'pendiente',
-            metodoEnvio: shippingMethod,
-            metodoPago,
-            direccion: [
-                shippingAddress.linea1,
-                shippingAddress.linea2,
-                shippingAddress.distrito,
-                shippingAddress.ciudad,
-                shippingAddress.pais
-            ]
-        });
-
-        for (const item of cartItems) {
-            await OrderProduct.create({
-                ordenId: nuevaOrden.id,
-                productoId: item.id,
-                cantidad: item.cantidad
-            });
-        }
-
-        res.status(201).json({ message: 'Orden creada exitosamente', ordenId: nuevaOrden.id });
-    } catch (error) {
-        console.error('Error al crear la orden:', error);
-        res.status(500).json({ message: 'Error al crear la orden' });
+  
+    if (!userId) {
+      return res.status(401).json({ message: 'No autenticado' });
     }
-});
-
+  
+    try {
+      let metodoPago;
+      if (paymentMethod === 'tarjeta') {
+        metodoPago = creditCard.numeroTarjeta.slice(-4).padStart(16, '*'); // Guarda solo los últimos 4 dígitos de la tarjeta
+      } else {
+        metodoPago = paymentMethod; // Esto será 'qr'
+      }
+  
+      const nuevaOrden = await Orden.create({
+        fechaOrden: new Date(),
+        total,
+        estado: 'pendiente',
+        metodoEnvio: shippingMethod,
+        metodoPago,
+        direccion: [
+          shippingAddress.linea1,
+          shippingAddress.linea2,
+          shippingAddress.distrito,
+          shippingAddress.ciudad,
+          shippingAddress.pais
+        ],
+        usuarioId: userId
+      });
+  
+      for (const item of cartItems) {
+        await OrderProduct.create({
+          ordenId: nuevaOrden.id,
+          productoId: item.id,
+          cantidad: item.cantidad
+        });
+      }
+  
+      res.status(201).json({ message: 'Orden creada exitosamente', ordenId: nuevaOrden.id });
+    } catch (error) {
+      console.error('Error al crear la orden:', error);
+      res.status(500).json({ message: 'Error al crear la orden' });
+    }
+  });
 
 
 // Crear una nueva orden

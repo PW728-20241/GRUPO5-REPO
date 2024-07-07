@@ -31,7 +31,7 @@ const Header1 = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/iniciar-sesion'); // Redirigir a la página de inicio de sesión
+    navigate('/iniciarsesion'); // Redirigir a la página de inicio de sesión
   };
 
   return (

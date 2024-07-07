@@ -21,7 +21,7 @@ import Registrar from './Paginas/Alumno03/Registrar';
 import Iniciarsesion from './Paginas/Alumno03/IniciarSesion';
 import RecuperarPassword from './Paginas/Alumno03/RecuperarPassword';
 import ListadoSeries from './Paginas/Alumno04/LSA';
-
+import PrivateRoute from './Componentes/PrivateRoute';
 import DashboardUsuario from './Paginas/Alumno03/DashboardUsuario';
 import { AuthProvider } from './Componentes/AuthContext';
 
@@ -57,7 +57,9 @@ function App (){
               <Route 
               path='/checkout' 
               element={
+                <PrivateRoute>
               <CheckoutPage/>
+              </PrivateRoute>
               }
               />
               <Route path='/registrar'element={<Registrar/>}/>
