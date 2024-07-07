@@ -28,7 +28,7 @@ const ChangePassword = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3100/usuarios/${userId}/cambiar-password`, {
+      const response = await fetch(`http://grupo5final.azurewebsites.net/usuarios/${userId}/cambiar-password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -38,7 +38,7 @@ const ChangePassword = () => {
 
       if (response.ok) {
         alert('Contraseña actualizada correctamente');
-        // Actualizar la contraseña en el localStorage
+       
         user.password = newPassword;
         localStorage.setItem('user', JSON.stringify(user));
       } else {

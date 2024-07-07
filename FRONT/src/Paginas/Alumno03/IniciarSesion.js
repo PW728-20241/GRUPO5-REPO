@@ -16,7 +16,7 @@ const IniciarSesion = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:3100/login', {
+      const response = await fetch('http://grupo5final.azurewebsites.net/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -27,11 +27,11 @@ const IniciarSesion = () => {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user)); // Guardar la información del usuario
+        localStorage.setItem('user', JSON.stringify(data.user)); 
         login({ ...data.user, token: data.token });
         alert(data.message);
 
-        // Redirigir al dashboard correspondiente según el correo y la contraseña
+        
         if (correo === 'admin@ejemplo.com' && password === 'admin') {
           navigate('/Dashboard');
         } else {

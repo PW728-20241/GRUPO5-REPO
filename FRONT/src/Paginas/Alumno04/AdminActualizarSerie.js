@@ -16,14 +16,14 @@ const SeriesDetail = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        let response = await fetch(`http://localhost:3100/series/${id}`);
+        let response = await fetch(`http://grupo5final.azurewebsites.net/series/${id}`);
         if (!response.ok) {
           throw new Error('Error fetching series data');
         }
         let data = await response.json();
         setSerie(data);
 
-        response = await fetch('http://localhost:3100/productos');
+        response = await fetch('http://grupo5final.azurewebsites.net/productos');
         if (!response.ok) {
           throw new Error('Error fetching products');
         }
@@ -59,7 +59,7 @@ const SeriesDetail = () => {
 
   const updateSerie = async (updatedSerie) => {
     try {
-      const response = await fetch(`http://localhost:3100/series/${id}`, {
+      const response = await fetch(`http://grupo5final.azurewebsites.net/series/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

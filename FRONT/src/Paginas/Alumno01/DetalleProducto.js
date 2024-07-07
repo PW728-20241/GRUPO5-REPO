@@ -14,12 +14,12 @@ const DetalleProducto = () => {
   useEffect(() => {
     async function fetchProduct() {
       try {
-        const response = await fetch(`http://localhost:3100/producto/id/${id}`);
+        const response = await fetch(`http://grupo5final.azurewebsites.net/producto/id/${id}`);
         if (!response.ok) {
           throw new Error('Error al obtener los datos del producto');
         }
         const data = await response.json();
-        setProduct({ ...data, imageUrl: `http://localhost:3100${data.imageUrl}` });
+        setProduct({ ...data, imageUrl: `http://grupo5final.azurewebsites.net${data.imageUrl}` });
       } catch (error) {
         console.error('Error:', error);
       }

@@ -29,7 +29,7 @@ const Registrar = () => {
         const nuevoUsuario = { nombre, apellido, correo, password };
         
         try {
-            const response = await fetch('http://localhost:3100/registrar', {
+            const response = await fetch('http://grupo5final.azurewebsites.net/registrar', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

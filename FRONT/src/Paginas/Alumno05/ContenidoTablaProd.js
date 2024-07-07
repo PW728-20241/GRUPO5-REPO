@@ -5,7 +5,7 @@ import { Link as RouterLink } from 'react-router-dom';
 function AgregarFila(props) {   
     const { producto } = props;
     async function eliminarProducto() {
-        const respuesta = await fetch(`http://localhost:3100/productos/${producto.id}`, {method: 'DELETE'});
+        const respuesta = await fetch(`http://grupo5final.azurewebsites.net/productos/${producto.id}`, {method: 'DELETE'});
         if (respuesta.status == 200) {
             alert("Producto eliminado con éxito");
             window.location.href = window.location.href;

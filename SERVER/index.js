@@ -14,7 +14,9 @@ import {
 } from "./models/Relation.js";
 
 const app = express();
-const port = 3100;
+const port = process.env.PORT || 4000;
+
+
 
 app.use(
   cors({
@@ -39,6 +41,9 @@ async function verificacionConexion() {
   }
 }
 
+
+
+
 app.post('/generate-qr', (req, res) => {
     const { orderId } = req.body;
     const qrData = `Order ID: ${orderId}`;
@@ -51,6 +56,7 @@ app.post('/generate-qr', (req, res) => {
       }
     });
   });
+
 app.get("/productos", async function (req, res) {
   const listaProducto = await Producto.findAll();
   res.json(listaProducto);
@@ -122,7 +128,7 @@ app.get("/buscar", async function (req, res) {
   const resultados = await Producto.findAll({
     where: {
       nombre: {
-        [Sequelize.Op.iLike]: `%${query}%`, // Case-insensitive search
+        [Sequelize.Op.iLike]: `%${query}%`, 
       },
     },
   });
@@ -136,11 +142,10 @@ app.get("/buscar", async function (req, res) {
   }
 });
 
-/*
------------------------------------------------------
-...................ALUMNO 5..........................
------------------------------------------------------
-*/
+
+
+
+
 
 app.get("/productos-url", function (req, res) {
   const { id, nombre, editor, estado } = req.query;
@@ -200,7 +205,7 @@ app.put("/usuarios/:id/cambiar-password", async (req, res) => {
       return res.status(400).json({ message: "Contraseña actual incorrecta" });
     }
 
-    // Cambia la contraseña
+  
     usuario.password = newPassword;
     await usuario.save();
 
@@ -220,7 +225,7 @@ app.get("/usuarios/fechaRegistro/:fechaRegistro", async function (req, res) {
     const usuarios = await Usuario.findAll({
       where: {
         fechaRegistro: {
-          [Op.between]: [fechaInicio, fechaFin], // Usa between para abarcar todo el día
+          [Op.between]: [fechaInicio, fechaFin], 
         },
       },
     });
@@ -245,7 +250,7 @@ app.get("/orden/fechaOrden/:fechaOrden", async function (req, res) {
     const orden = await Orden.findAll({
       where: {
         fechaOrden: {
-          [Op.between]: [fechaInicio, fechaFin], // Usa between para abarcar todo el día
+          [Op.between]: [fechaInicio, fechaFin], 
         },
       },
     });
@@ -345,11 +350,8 @@ app.delete("/productos/:id", function (req, res) {
   }
 });
 
-/*
------------------------------------------------------
-...................ALUMNO 6..........................
------------------------------------------------------
-*/
+
+
 
 app.get("/usuarios", async function (req, res) {
   const usuarios = await Usuario.findAll();
@@ -515,11 +517,10 @@ app.get("/ordenes-url", async function (req, res) {
   }
 });
 
-/*
------------------------------------------------------
-...................ALUMNO 4..........................
------------------------------------------------------
-*/
+
+
+
+
 
 app.post("/registrar", async (req, res) => {
   const { nombre, apellido, correo, password } = req.body;
@@ -575,7 +576,7 @@ app.post("/recuperarPassword", async (req, res) => {
   try {
     const usuario = await Usuario.findOne({ where: { correo } });
     if (usuario) {
-      // Aquí puedes agregar lógica para enviar un correo de recuperación
+      
       res.json({ message: "Correo de recuperación enviado" });
     } else {
       res.status(404).json({ error: "Correo no encontrado" });
@@ -608,9 +609,9 @@ app.post("/orden", async (req, res) => {
   try {
     let metodoPago;
     if (paymentMethod === "tarjeta") {
-      metodoPago = creditCard.numeroTarjeta.slice(-4).padStart(16, "*"); // Guarda solo los últimos 4 dígitos de la tarjeta
+      metodoPago = creditCard.numeroTarjeta.slice(-4).padStart(16, "*"); 
     } else {
-      metodoPago = paymentMethod; // Esto será 'qr'
+      metodoPago = paymentMethod; 
     }
 
     const nuevaOrden = await Orden.create({
@@ -897,30 +898,30 @@ app.delete("/series/:id", async (req, res) => {
   }
 });
 
-// Datos en memoria para el ejemplo
+
 let carrito = [];
 let guardadosParaDespues = [];
 
-// Obtener el carrito de compras
+
 app.get("/carrito", (req, res) => {
   res.json(carrito);
 });
 
-// Añadir producto al carrito de compras
+
 app.post("/carrito", (req, res) => {
   const producto = req.body;
   carrito.push(producto);
   res.json(carrito);
 });
 
-// Eliminar producto del carrito de compras
+
 app.delete("/carrito/:id", (req, res) => {
   const id = parseInt(req.params.id, 10);
   carrito = carrito.filter((producto) => producto.id !== id);
   res.json(carrito);
 });
 
-// Mover producto a guardados para después
+
 app.post("/guardarParaDespues", (req, res) => {
   const producto = req.body;
   guardadosParaDespues.push(producto);
@@ -928,12 +929,12 @@ app.post("/guardarParaDespues", (req, res) => {
   res.json({ carrito, guardadosParaDespues });
 });
 
-// Obtener los guardados para después
+
 app.get("/guardadosParaDespues", (req, res) => {
   res.json(guardadosParaDespues);
 });
 
-// Mover producto del guardado para después al carrito
+
 app.post("/moverAlCarrito", (req, res) => {
   const producto = req.body;
   carrito.push(producto);

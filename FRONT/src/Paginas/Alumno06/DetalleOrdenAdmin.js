@@ -10,7 +10,7 @@ const DetalleOrdenAdmin = () => {
   useEffect(() => {
     const fetchDetalleOrden = async () => {
       try {
-        const response = await fetch(`http://localhost:3100/orden/${id}`);
+        const response = await fetch(`http://grupo5final.azurewebsites.net/orden/${id}`);
         const data = await response.json();
         setDetalleOrden(data);
       } catch (error) {
@@ -23,7 +23,7 @@ const DetalleOrdenAdmin = () => {
 
   const handleCancelarOrden = async () => {
     try {
-      const response = await fetch(`http://localhost:3100/orden/${id}`, {
+      const response = await fetch(`http://grupo5final.azurewebsites.net/orden/${id}`, {
         method: 'DELETE'
       });
 

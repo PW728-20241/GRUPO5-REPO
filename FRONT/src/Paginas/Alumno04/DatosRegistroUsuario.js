@@ -35,7 +35,7 @@ const Detalle = () => {
   const handleUpdate = async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await fetch(`http://localhost:3100/usuarios/${userData.id}`, {
+      const response = await fetch(`http://grupo5final.azurewebsites.net/usuarios/${userData.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

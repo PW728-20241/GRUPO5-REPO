@@ -10,7 +10,7 @@ const SeriesTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
-    fetch('http://localhost:3100/series')
+    fetch('http://grupo5final.azurewebsites.net/series')
       .then(response => response.json())
       .then(data => {
         setSeries(data);

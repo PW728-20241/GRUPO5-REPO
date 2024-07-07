@@ -17,7 +17,7 @@ const CreateSerie = () => {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const response = await fetch('http://localhost:3100/productos');
+        const response = await fetch('http://grupo5final.azurewebsites.net/productos');
         if (!response.ok) {
           throw new Error('Error fetching products');
         }
@@ -54,7 +54,7 @@ const CreateSerie = () => {
     const nuevaSerie = { nombre, descripcion, fechaCreacion: new Date().toISOString().split('T')[0], productos: serieProductos };
     
     try {
-      const response = await fetch('http://localhost:3100/series', {
+      const response = await fetch('http://grupo5final.azurewebsites.net/series', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

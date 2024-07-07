@@ -13,7 +13,7 @@ const PaginaPrincipal = () => {
   useEffect(() => {
     async function obtenerProductos() {
       try {
-        const response = await fetch('http://localhost:3100/productos');
+        const response = await fetch('http://grupo5final.azurewebsites.net/productos');
         if (!response.ok) {
           throw new Error('Error al obtener los datos del servidor');
         }
@@ -23,7 +23,7 @@ const PaginaPrincipal = () => {
 
         const makeAbsoluteUrls = (items) => items.map(item => ({
           ...item,
-          imageUrl: `http://localhost:3100${item.imageUrl}`
+          imageUrl: `http://grupo5final.azurewebsites.net${item.imageUrl}`
         }));
 
         setProductos(makeAbsoluteUrls(data));
@@ -35,13 +35,13 @@ const PaginaPrincipal = () => {
     obtenerProductos();
   }, []);
 
-  // Filtrar productos por categorías específicas
+  
   const categorias = productos.filter(producto => producto.categoria === 'Colección');
   
-  // Filtrar productos marcados como nuevos
+ 
   const nuevos = productos.filter(producto => producto.nuevo === true);
 
-  // Dividir productos en filas para mostrar en la página
+ 
   const fila1 = productos.slice(0, 5);
   const fila2 = productos.slice(5, 10);
   const fila3 = productos.slice(10, 15);

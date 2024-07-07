@@ -14,7 +14,7 @@ const ListaOrdenesAdmin = () => {
   const navigate = useNavigate();
 
   async function obtenerOrdenes(query="") {
-    const url_base = `http://localhost:3100/busquedadeorden`;
+    const url_base = `http://grupo5final.azurewebsites.net/busquedadeorden`;
     const url = query ? `${url_base}?id=${query}` : url_base; 
     try {
       const res = await fetch(url);
@@ -43,7 +43,7 @@ const ListaOrdenesAdmin = () => {
 
   const handleDesactivarOrden = async (ordenId) => {
     try {
-      const response = await fetch(`http://localhost:3100/ordenes1/${ordenId}`, {
+      const response = await fetch(`http://grupo5final.azurewebsites.net/ordenes1/${ordenId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -51,7 +51,7 @@ const ListaOrdenesAdmin = () => {
       });
       if (response.status === 200) {
         alert("Esta orden ha sido desactivada");
-        obtenerOrdenes(); // Actualizar la lista de órdenes después de desactivar
+        obtenerOrdenes(); 
       } else {
         alert("Error al desactivar la orden");
       }

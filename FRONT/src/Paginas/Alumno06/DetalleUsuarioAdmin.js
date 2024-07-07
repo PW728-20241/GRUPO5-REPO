@@ -13,7 +13,7 @@ function DetalleUsuarioAdmin() {
     useEffect(() => {
         const fetchUsuario = async () => {
             try {
-                const res = await fetch(`http://localhost:3100/usuarios/detalle/${id}`);
+                const res = await fetch(`http://grupo5final.azurewebsites.net/usuarios/detalle/${id}`);
                 if (res.ok) {
                     const data = await res.json();
                     setUsuario(data);
@@ -29,7 +29,7 @@ function DetalleUsuarioAdmin() {
 
         const fetchOrdenes = async () => {
             try {
-                const res = await fetch(`http://localhost:3100/usuario/${id}/ordenes`);
+                const res = await fetch(`http://grupo5final.azurewebsites.net/usuario/${id}/ordenes`);
                 if (res.ok) {
                     const data = await res.json();
                     setOrdenes(data);

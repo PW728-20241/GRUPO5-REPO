@@ -19,7 +19,7 @@ const ListaOrdenesusuario = () => {
       alert('No estás logueado');
       return;
     }
-    const url_base = query ? `http://localhost:3100/busquedaordensenusuarios?usuarioId=${usuarioId}&id=${query}` : `http://localhost:3100/busquedaordensenusuarios?usuarioId=${usuarioId}`;
+    const url_base = query ? `http://grupo5final.azurewebsites.net/busquedaordensenusuarios?usuarioId=${usuarioId}&id=${query}` : `http://grupo5final.azurewebsites.net/busquedaordensenusuarios?usuarioId=${usuarioId}`;
     try {
       const res = await fetch(url_base);
       if (res.status === 200) {
@@ -43,7 +43,7 @@ const ListaOrdenesusuario = () => {
 
   const handleDesactivarOrden = async (ordenId) => {
     try {
-      const response = await fetch(`http://localhost:3100/ordenes1/${ordenId}`, {
+      const response = await fetch(`http://grupo5final.azurewebsites.net/ordenes1/${ordenId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

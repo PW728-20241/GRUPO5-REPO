@@ -15,10 +15,10 @@ function AdminProducto (){
 
     const fetchData = async () => {
         try {
-            const URL_base = 'http://localhost:3100/';
+            const URL_base = 'http://grupo5final.azurewebsites.net/';
             const respuesta = await fetch(URL_base + 'productos');
             const resultado = await respuesta.json();
-            const productosOrdenados = resultado.sort((a, b) => a.id - b.id); // Ordenar los productos por id
+            const productosOrdenados = resultado.sort((a, b) => a.id - b.id); 
             setData(productosOrdenados);
             setAllData(productosOrdenados);
         } catch (error) {
@@ -38,7 +38,7 @@ function AdminProducto (){
         }
         
         try {
-            const URL_base = 'http://localhost:3100/';
+            const URL_base = 'http://grupo5final.azurewebsites.net/';
             const respuesta = await fetch(`${URL_base}producto/id/${searchParams}`);
             if (!respuesta.ok) {
                 throw new Error('Producto no encontrado');

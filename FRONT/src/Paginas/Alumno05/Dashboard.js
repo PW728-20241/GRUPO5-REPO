@@ -20,12 +20,12 @@ const Dashboard = () => {
         async function fetchData() {
             try {
                 
-                const usuariosRespuesta = await fetch(`http://localhost:3100/usuarios/fechaRegistro/${fecha}`);
+                const usuariosRespuesta = await fetch(`http://grupo5final.azurewebsites.net/usuarios/fechaRegistro/${fecha}`);
                 const usuariosData = await usuariosRespuesta.json();
                 const usuariosNuevos = Array.isArray(usuariosData) ? usuariosData.length : 0;
 
                 
-                const ordenesRespuesta = await fetch(`http://localhost:3100/orden/fechaOrden/${fecha}`);
+                const ordenesRespuesta = await fetch(`http://grupo5final.azurewebsites.net/orden/fechaOrden/${fecha}`);
                 const ordenesData = await ordenesRespuesta.json();
                 const cantOrdenesDia = Array.isArray(ordenesData) ? ordenesData.length : 0;
 

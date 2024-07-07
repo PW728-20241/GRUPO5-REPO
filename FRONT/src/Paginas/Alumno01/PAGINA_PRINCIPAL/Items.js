@@ -34,7 +34,7 @@ const Items = ({ items }) => {
               backgroundPosition: 'center',
             }}
           >
-            {/* Puedes agregar un mensaje de carga o un fallback aquí si lo deseas */}
+            
           </Box>
           <Typography variant="h6" align="left">{item.nombre}</Typography>
           <Subrayado to={`/detalle/${item.id}`} pb={4}>Learn More</Subrayado>

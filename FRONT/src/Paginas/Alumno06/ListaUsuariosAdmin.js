@@ -23,7 +23,7 @@ function ListaUsuarios() {
   };
 
   async function busquedaDatos(query = "") {
-    const url_base = "http://localhost:3100/usuarios";
+    const url_base = "http://grupo5final.azurewebsites.net/usuarios";
     const url = query ? `${url_base}/${query}` : url_base;
 
     try {
@@ -52,7 +52,7 @@ function ListaUsuarios() {
 
   const handleEstadoChange = async (id) => {
     try {
-      const res = await fetch(`http://localhost:3100/usuarios/cambioEstado/${id}`, {
+      const res = await fetch(`http://grupo5final.azurewebsites.net/usuarios/cambioEstado/${id}`, {
         method: 'PUT'
       });
 

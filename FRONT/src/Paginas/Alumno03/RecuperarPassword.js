@@ -10,7 +10,7 @@ const RecuperarPassword = () => {
     const manejarRecuperarPassword = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:3100/recuperarPassword', {
+            const response = await fetch('http://grupo5final.azurewebsites.net/recuperarPassword', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

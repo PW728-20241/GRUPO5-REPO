@@ -27,7 +27,7 @@ const AgregarProducto = () => {
         };
 
         try {
-            const response = await fetch('http://localhost:3100/productos', {
+            const response = await fetch('http://grupo5final.azurewebsites.net/productos', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -74,7 +74,7 @@ const CheckoutPage = () => {
 
   const generateQr = async () => {
     try {
-      const response = await fetch('http://localhost:3100/generate-qr', {
+      const response = await fetch('http://grupo5final.azurewebsites.net/generate-qr', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -105,7 +105,7 @@ const CheckoutPage = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:3100/orden', {
+      const response = await fetch('http://grupo5final.azurewebsites.net/orden', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

@@ -9,15 +9,14 @@ import SelectorOrden from '../Alumno01/RESULTADO_BUSQUEDA/Orden';
 const ResultadoBusqueda = () => {
     const [productos, setProductos] = useState([]);
     const [paginaActual, setPaginaActual] = useState(1);
-    const productosPorPagina = 5; // Número de productos por página
+    const productosPorPagina = 5; 
 
     const location = useLocation();
-    const query = location.state?.query || ''; // Obtener el término de búsqueda de la navegación
-
+    const query = location.state?.query || ''; 
     useEffect(() => {
         const fetchProductos = async () => {
             try {
-                const response = await fetch(`http://localhost:3100/buscar?query=${query}`);
+                const response = await fetch(`http://grupo5final.azurewebsites.net/buscar?query=${query}`);
                 if (!response.ok) {
                     throw new Error('Error al obtener los datos del servidor');
                 }
@@ -27,7 +26,7 @@ const ResultadoBusqueda = () => {
                     title: producto.nombre,
                     price: producto.precio,
                     brand: producto.serie,
-                    imageUrl: `http://localhost:3100${producto.imageUrl}`,
+                    imageUrl: `http://grupo5final.azurewebsites.net${producto.imageUrl}`,
                     link: `#producto-${index}`
                 }));
                 setProductos(resultados);

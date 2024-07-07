@@ -3,14 +3,14 @@ import { Box, Typography, Button } from '@mui/material';
 
 function SavedItem({ item }) {
   const handleEliminar = async () => {
-    await fetch(`http://localhost:3100/guardadosParaDespues/${item.id}`, {
+    await fetch(`http://grupo5final.azurewebsites.net/guardadosParaDespues/${item.id}`, {
       method: 'DELETE',
     });
     // Actualizar estado aquí
   };
 
   const handleMoverAlCarrito = async () => {
-    await fetch('http://localhost:3100/moverAlCarrito', {
+    await fetch('http://grupo5final.azurewebsites.net/moverAlCarrito', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

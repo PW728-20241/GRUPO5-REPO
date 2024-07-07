@@ -10,14 +10,14 @@ export const OrderProduct = sequelize.define('OrderProduct', {
     ordenId: {
         type: DataTypes.INTEGER,
         references: {
-            model: 'Orden', // Nombre de la tabla a la que hace referencia
+            model: 'Orden', 
             key: 'id'
         }
     },
     productoId: {
         type: DataTypes.INTEGER,
         references: {
-            model: 'Producto', // Nombre de la tabla a la que hace referencia
+            model: 'Producto', 
             key: 'id'
         }
     },

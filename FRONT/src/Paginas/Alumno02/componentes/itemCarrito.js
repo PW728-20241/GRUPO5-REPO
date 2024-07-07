@@ -3,14 +3,14 @@ import { Box, Typography, Button, FormControl, Select, MenuItem } from '@mui/mat
 
 function CartItem({ item }) {
   const handleEliminar = async () => {
-    await fetch(`http://localhost:3100/carrito/${item.id}`, {
+    await fetch(`http://grupo5final.azurewebsites.net/carrito/${item.id}`, {
       method: 'DELETE',
     });
     // Actualizar estado aquí
   };
 
   const handleGuardarParaDespues = async () => {
-    await fetch('http://localhost:3100/guardarParaDespues', {
+    await fetch('http://grupo5final.azurewebsites.net/guardarParaDespues', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -3,14 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Container, CssBaseline, Paper, Typography, Grid, Radio, RadioGroup, FormControlLabel, Button } from '@mui/material';
 
 const DetalleOrden = () => {
-  const { id } = useParams(); // Obtener el ID de la orden de los parámetros de la URL
+  const { id } = useParams(); 
   const [orderDetails, setOrderDetails] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:3100/orden/${id}`);
+        const response = await fetch(`http://grupo5final.azurewebsites.net/orden/${id}`);
         const data = await response.json();
         setOrderDetails(data);
       } catch (error) {
@@ -23,13 +23,13 @@ const DetalleOrden = () => {
 
   const handleCancelOrder = async () => {
     try {
-      const response = await fetch(`http://localhost:3100/orden/${id}`, {
+      const response = await fetch(`http://grupo5final.azurewebsites.net/orden/${id}`, {
         method: 'DELETE'
       });
 
       if (response.ok) {
         alert('Orden cancelada exitosamente');
-        navigate('/'); // Redirige a la página principal o cualquier otra página
+        navigate('/'); 
       } else {
         alert('Error al cancelar la orden');
       }
