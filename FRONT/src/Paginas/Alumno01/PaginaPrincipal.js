@@ -35,16 +35,17 @@ const PaginaPrincipal = () => {
     obtenerProductos();
   }, []);
 
-  
   const categorias = productos.filter(producto => producto.categoria === 'Colección');
-  
- 
   const nuevos = productos.filter(producto => producto.nuevo === true);
 
- 
-  const fila1 = productos.slice(0, 5);
-  const fila2 = productos.slice(5, 10);
-  const fila3 = productos.slice(10, 15);
+  
+  const productosSinCategoriasYNuevos = productos.filter(producto => 
+    !nuevos.includes(producto) && !categorias.includes(producto)
+  );
+
+  const fila1 = productosSinCategoriasYNuevos.slice(0, 5);
+  const fila2 = productosSinCategoriasYNuevos.slice(5, 10);
+  const fila3 = productosSinCategoriasYNuevos.slice(10, 15);
 
   return (
     <>
@@ -55,17 +56,14 @@ const PaginaPrincipal = () => {
         <CategoriaSeccion categorias={categorias} />
         
         <Box id='ofertas' mb={4}>
-          
           <Items items={fila1} />
           <Items items={fila2} />
         </Box>
         <Divider />
         
-       
         <NuevaSeccion nuevos={nuevos} />
         
         <Box mb={4}>
-          
           <Items items={fila3} />
         </Box>
       </Container>
