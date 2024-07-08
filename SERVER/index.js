@@ -29,8 +29,6 @@ app.use(
   })
 );
 app.use(express.json());
-app.use("/images", express.static("Imagenes"));
-
 async function verificacionConexion() {
   try {
     sequelize.authenticate();
@@ -40,9 +38,6 @@ async function verificacionConexion() {
     console.error("No se puede conectar a la BD", error);
   }
 }
-
-
-
 
 app.post('/generate-qr', (req, res) => {
     const { orderId } = req.body;
@@ -141,11 +136,6 @@ app.get("/buscar", async function (req, res) {
       .send("No se encontraron productos que coincidan con la búsqueda.");
   }
 });
-
-
-
-
-
 
 app.get("/productos-url", function (req, res) {
   const { id, nombre, editor, estado } = req.query;
@@ -265,21 +255,30 @@ app.get("/orden/fechaOrden/:fechaOrden", async function (req, res) {
     res.status(500).json({ error: "Error interno del servidor" });
   }
 });
-
 app.get("/productos/random", async (req, res) => {
-    try {
-      const productos = await Producto.findAll();
-      const randomItems = productos.sort(() => 0.5 - Math.random()).slice(0, 5);
-      const productosConUrlCompleta = randomItems.map(producto => ({
-        ...producto.toJSON(),
-        imageUrl: `http://localhost:3100${producto.imageUrl}`
-      }));
-      res.json(productosConUrlCompleta);
-    } catch (error) {
-      console.error("Error fetching random products:", error);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  });
+  try {
+    const productos = await Producto.findAll();
+    const randomItems = productos.sort(() => 0.5 - Math.random()).slice(0, 5);
+
+    const productosConUrlCompleta = randomItems.map(producto => {
+      if (producto.imageUrl.startsWith('http')) {
+        return producto;
+      } else {
+        return {
+          ...producto.toJSON(),
+          imageUrl: `http://grupo5final.azurewebsites.net${producto.imageUrl}`
+        };
+      }
+    });
+
+    res.json(productosConUrlCompleta);
+  } catch (error) {
+    console.error("Error fetching random products:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
   
 
 app.post("/productos", async (req, res) => {
@@ -591,62 +590,41 @@ app.post("/recuperarPassword", async (req, res) => {
 ENDPOINTS PARA ORDENES
 */
 
-app.post("/orden", async (req, res) => {
-  const {
-    shippingAddress,
-    paymentMethod,
-    creditCard,
-    cartItems,
-    total,
-    shippingMethod,
-    userId,
-  } = req.body;
-
-  if (!userId) {
-    return res.status(401).json({ message: "No autenticado" });
-  }
+app.post('/orden', async (req, res) => {
+  const { shippingAddress, paymentMethod, creditCard, cartItems, total, shippingMethod, userId } = req.body;
 
   try {
-    let metodoPago;
-    if (paymentMethod === "tarjeta") {
-      metodoPago = creditCard.numeroTarjeta.slice(-4).padStart(16, "*"); 
-    } else {
-      metodoPago = paymentMethod; 
-    }
-
-    const nuevaOrden = await Orden.create({
-      fechaOrden: new Date(),
-      total,
-      estado: "pendiente",
+    // Crear la orden
+    const newOrder = await Orden.create({
+      direccion: shippingAddress,
+      metodoPago: paymentMethod,
       metodoEnvio: shippingMethod,
-      metodoPago,
-      direccion: [
-        shippingAddress.linea1,
-        shippingAddress.linea2,
-        shippingAddress.distrito,
-        shippingAddress.ciudad,
-        shippingAddress.pais,
-      ],
-      usuarioId: userId,
+      total,
+      estado: 'pendiente',
+      usuarioId: userId
     });
 
+    // Crear las relaciones de productos en la orden y reducir el stock
     for (const item of cartItems) {
       await OrderProduct.create({
-        ordenId: nuevaOrden.id,
+        ordenId: newOrder.id,
         productoId: item.id,
-        cantidad: item.cantidad,
+        cantidad: item.cantidad
       });
+
+      const producto = await Producto.findByPk(item.id);
+      if (producto) {
+        producto.stock -= item.cantidad;
+        await producto.save();
+      }
     }
 
-    res
-      .status(201)
-      .json({ message: "Orden creada exitosamente", ordenId: nuevaOrden.id });
+    res.json(newOrder);
   } catch (error) {
-    console.error("Error al crear la orden:", error);
-    res.status(500).json({ message: "Error al crear la orden" });
+    console.error('Error al crear la orden:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
-
 app.get('/ordenes', async (req, res) => {
     const usuarioId = req.query.usuarioId;
   

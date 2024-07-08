@@ -34,12 +34,7 @@ function RecommendedItems() {
         {recommendedItems.map(item => (
           <Grid item xs={12} sm={6} md={2.4} key={item.id}>
             <Card>
-              <CardMedia
-                component="img"
-                height="140"
-                image={item.imageUrl}
-                alt={item.nombre}
-              />
+              <img src={item.imageUrl} alt={item.nombre} style={{ width: 160, height: 160, objectFit: 'cover', marginRight: 16 }} />
               <CardContent>
                 <Typography gutterBottom variant="h6" component="div">
                   {item.nombre}

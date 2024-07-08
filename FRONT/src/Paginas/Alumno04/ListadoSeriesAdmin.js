@@ -41,6 +41,22 @@ const SeriesTable = () => {
     setPage(0);
   };
 
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`http://grupo5final.azurewebsites.net/series/${id}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        setSeries(series.filter(serie => serie.id !== id));
+        setFilteredSeries(filteredSeries.filter(serie => serie.id !== id));
+      } else {
+        console.error('Error deleting series:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error deleting series:', error);
+    }
+  };
+
   return (
     <Paper elevation={3} sx={{ margin: 'center', padding: 2 }}>
       <Typography variant="h6" gutterBottom>Series</Typography>
@@ -81,6 +97,9 @@ const SeriesTable = () => {
                 <TableCell>
                   <Button variant="contained" color="primary" component={Link} to={`/ver/serie/${serie.id}`}>
                     Ver
+                  </Button>
+                  <Button variant="contained" color="secondary" onClick={() => handleDelete(serie.id)}>
+                    Eliminar
                   </Button>
                 </TableCell>
               </TableRow>
