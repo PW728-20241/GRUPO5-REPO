@@ -33,8 +33,9 @@ import Ayuda from './Componentes/ayuda';
 function App (){
   return (
     <AuthProvider>
-     <Router>
+     <Router >
           <Routes>
+            
               <Route path='' element={<PaginaPrincipal/>}/>
               <Route path='/resultado' element={<ResultadoBusqueda/>}/>
               <Route path='/detalle/:id' element={<DetalleProducto/>}/>  
